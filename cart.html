@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extra Store — Cart</title>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: "#fffdf8",
+            blush: "#f6ecd9",
+            terracotta: "#7a1f2b",
+            terracottaDark: "#5c141e",
+            gold: "#c9a227",
+            goldLight: "#e6c866",
+            ink: "#2a1f1c",
+            muted: "#8c7a66",
+            line: "#ecdfc2"
+          },
+          fontFamily: {
+            sans: ["Poppins", "Arial", "sans-serif"],
+            serif: ["Playfair Display", "Georgia", "serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body class="min-h-screen bg-[#faf7f2] font-sans text-ink">
+  <header class="sticky top-0 z-50 border-b border-line/80 bg-cream/90 backdrop-blur">
+    <div class="mx-auto flex max-w-screen-2xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="h-6 w-auto max-w-[5.5rem] object-contain sm:h-7 lg:h-8">
+      </a>
+      <nav class="hidden items-center gap-8 text-sm text-ink lg:flex">
+        <a class="transition hover:text-terracottaDark" href="index.html">Home</a>
+        <a class="transition hover:text-terracottaDark" href="index.html#featured-products">Shop</a>
+        <a class="transition hover:text-terracottaDark" href="cart.html" aria-current="page">Cart</a>
+        <a class="transition hover:text-terracottaDark" href="checkout.html">Checkout</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <a href="cart.html" class="inline-flex items-center gap-2 rounded-full border border-[#7a1f2b]/15 bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] shadow-sm transition hover:bg-[#fff7f5]">
+          <span aria-hidden="true">🛒</span>
+          <span class="hidden sm:inline">Cart</span>
+          <span id="cartPageCount" data-cart-count class="hidden min-w-[1.2rem] rounded-full bg-[#7a1f2b] px-2 py-0.5 text-center text-[0.65rem] font-bold text-white">0</span>
+        </a>
+        <button type="button" data-nav-toggle aria-controls="mobileNav" aria-expanded="false" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm lg:hidden">☰</button>
+      </div>
+    </div>
+    <div data-nav-overlay class="site-nav-overlay lg:hidden"></div>
+    <aside id="mobileNav" data-nav-panel class="site-nav-panel lg:hidden">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="h-7 w-auto object-contain">
+        </a>
+        <button type="button" data-nav-close class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-2xl text-ink">×</button>
+      </div>
+      <nav class="mt-8 space-y-3">
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html">Home</a>
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html#featured-products">Shop</a>
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="cart.html" aria-current="page">Cart</a>
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="checkout.html">Checkout</a>
+      </nav>
+      <div class="mt-8 rounded-[1.25rem] border border-line bg-white p-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Quick actions</p>
+        <div class="mt-3 grid gap-3">
+          <a href="index.html" class="inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-[#fff7f5] px-4 py-3 text-sm font-semibold text-[#7a1f2b]">Continue Shopping</a>
+          <a href="checkout.html" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white">Checkout</a>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="px-4 py-6 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+    <div class="mx-auto max-w-screen-2xl">
+      <div class="page-surface rounded-[1.75rem] px-6 py-7 sm:px-8 sm:py-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">Shopping Bag</p>
+        <h1 class="mt-3 font-serif text-4xl text-ink sm:text-5xl">Your Cart</h1>
+        <p id="cartPageSummary" class="mt-3 text-sm text-muted">0 items</p>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <div class="space-y-4">
+          <div id="cartPageEmpty" class="hidden page-card rounded-[1.5rem] p-8 text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#7a1f2b] text-2xl text-white">🛒</div>
+            <h2 class="font-serif text-2xl text-ink">Your cart is empty</h2>
+            <p class="mt-2 text-sm leading-6 text-muted">Add some products from the home page and they will appear here.</p>
+            <a href="index.html#featured-products" class="mt-5 inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">Start Shopping</a>
+          </div>
+
+          <div id="cartPageItems" class="space-y-4"></div>
+        </div>
+
+        <aside class="h-fit page-card rounded-[1.5rem] p-6 sm:p-7">
+          <h2 class="font-serif text-2xl text-ink">Order Summary</h2>
+          <div class="mt-5 space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-muted">Subtotal</span>
+              <span data-cart-summary-subtotal class="font-semibold text-ink">$0.00</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-muted">Shipping</span>
+              <span data-cart-summary-shipping class="font-semibold text-ink">$0.00</span>
+            </div>
+            <div class="border-t border-line pt-3">
+              <div class="flex items-center justify-between text-base">
+                <span class="font-semibold text-ink">Total</span>
+                <span data-cart-summary-total class="font-semibold text-[#7a1f2b]">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-3">
+            <a href="checkout.html" class="inline-flex w-full items-center justify-center rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">
+              Proceed to Checkout
+            </a>
+            <a href="index.html#featured-products" class="inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-white px-6 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#fff7f5]">
+              Continue Shopping
+            </a>
+            <button id="clearCartBtn" type="button" class="inline-flex w-full items-center justify-center rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-terracottaDark transition hover:bg-[#fff7f5]">
+              Clear Cart
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full border-t border-line/80 bg-[#2b0a0f] text-[#f6ecd9]">
+    <div class="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
+      <div class="grid gap-8 lg:grid-cols-[1.1fr_0.95fr_0.95fr]">
+        <div>
+          <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-4 h-8 w-auto object-contain">
+          <p class="max-w-md text-sm leading-6 text-[#d9c49a]">
+            Everyday essentials, smart finds, and practical products for life on the move.
+          </p>
+        </div>
+        <div>
+          <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Contact</h4>
+          <ul class="space-y-3 text-sm text-[#d9c49a]">
+            <li><a class="transition hover:text-white" href="tel:+2347068905261">Call: 07068905261</a></li>
+            <li><a class="transition hover:text-white" href="https://wa.me/2347068905261" target="_blank" rel="noreferrer">WhatsApp: 07068905261</a></li>
+            <li><span>Email: hello@extrastore.com</span></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Socials</h4>
+          <ul class="space-y-3 text-sm text-[#d9c49a]">
+            <li><a class="transition hover:text-white" href="https://www.instagram.com/extra_storerix/" target="_blank" rel="noreferrer">Instagram: @extra_storerix</a></li>
+            <li><a class="transition hover:text-white" href="https://www.snapchat.com/add/extra_store" target="_blank" rel="noreferrer">Snapchat: @extra_store</a></li>
+            <li><a class="transition hover:text-white" href="https://www.tiktok.com/@extras_store" target="_blank" rel="noreferrer">TikTok: @extras_store</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76]">
+        © 2026 Extra Store. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/a11y.js"></script>
+  <script src="assets/js/navigation.js" defer></script>
+  <script src="assets/js/cart.js"></script>
+</body>
+</html>

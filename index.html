@@ -176,34 +176,64 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body class="min-h-screen w-full overflow-x-hidden bg-cream text-ink font-sans">
   <div class="w-full">
-    <header class="w-full border-b border-goldLight/70 bg-cream/95 backdrop-blur">
-      <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div class="flex justify-center lg:justify-start">
+    <header class="sticky top-0 z-50 border-b border-line/80 bg-cream/90 backdrop-blur">
+      <div class="mx-auto flex w-full max-w-screen-2xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <a href="index.html" class="flex items-center gap-3">
           <img
             src="assets/extra-store-logo.png"
             alt="Extra Store logo"
             class="h-6 w-auto max-w-[5.5rem] object-contain sm:h-7 lg:h-8"
           >
-        </div>
-        <nav class="flex justify-center">
-          <ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink sm:gap-x-8">
-            <li><a class="transition hover:text-terracottaDark" href="#">Shop</a></li>
-            <li><a class="transition hover:text-terracottaDark" href="#">New Arrivals</a></li>
-            <li><a class="transition hover:text-terracottaDark" href="#">About</a></li>
-            <li><a class="transition hover:text-terracottaDark" href="#">Contact</a></li>
-          </ul>
+        </a>
+        <nav class="hidden items-center gap-8 text-sm text-ink lg:flex">
+          <a class="transition hover:text-terracottaDark" href="index.html">Home</a>
+          <a class="transition hover:text-terracottaDark" href="#featured-products" data-scroll-target="featured-products">Shop</a>
+          <a class="transition hover:text-terracottaDark" href="cart.html">Cart</a>
+          <a class="transition hover:text-terracottaDark" href="checkout.html">Checkout</a>
         </nav>
-        <div class="flex items-center justify-center gap-4 lg:justify-end">
-          <span class="inline-block h-4 w-4 rounded-full border border-ink/80"></span>
-          <span class="inline-block h-4 w-4 rounded-full border border-ink/80"></span>
-          <button class="rounded-full bg-gold px-6 py-2 text-sm font-semibold text-terracottaDark transition hover:brightness-105">
-            Shop Now
+        <div class="flex items-center gap-3">
+          <a href="cart.html" class="inline-flex items-center gap-2 rounded-full border border-[#7a1f2b]/15 bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] shadow-sm transition hover:bg-[#fff7f5]">
+            <span aria-hidden="true">🛒</span>
+            <span class="hidden sm:inline">Cart</span>
+            <span data-cart-count class="hidden min-w-[1.2rem] rounded-full bg-[#7a1f2b] px-2 py-0.5 text-center text-[0.65rem] font-bold text-white">0</span>
+          </a>
+          <button
+            type="button"
+            data-nav-toggle
+            aria-controls="mobileNav"
+            aria-expanded="false"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm lg:hidden"
+          >
+            ☰
           </button>
         </div>
       </div>
+      <div data-nav-overlay class="site-nav-overlay lg:hidden"></div>
+      <aside id="mobileNav" data-nav-panel class="site-nav-panel lg:hidden">
+        <div class="flex items-center justify-between">
+          <a href="index.html" class="flex items-center gap-2">
+            <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="h-7 w-auto object-contain">
+          </a>
+          <button type="button" data-nav-close class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-2xl text-ink">×</button>
+        </div>
+        <nav class="mt-8 space-y-3">
+          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html">Home</a>
+          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="#featured-products" data-scroll-target="featured-products">Shop</a>
+          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="cart.html">Cart</a>
+          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="checkout.html">Checkout</a>
+        </nav>
+        <div class="mt-8 rounded-[1.25rem] border border-line bg-white p-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Quick actions</p>
+          <div class="mt-3 grid gap-3">
+            <a href="cart.html" class="inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-[#fff7f5] px-4 py-3 text-sm font-semibold text-[#7a1f2b]">View Cart</a>
+            <a href="checkout.html" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white">Checkout</a>
+          </div>
+        </div>
+      </aside>
     </header>
 
     <main class="w-full">
@@ -222,62 +252,88 @@
             </div>
           </div>
 
-          <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-            <div>
-              <h1 class="text-5xl font-semibold leading-none text-goldLight sm:text-6xl lg:text-7xl">
-                Everyday
-                <span class="mt-1 block font-script text-7xl font-normal leading-none text-transparent sm:text-8xl lg:text-[6.5rem] bg-gradient-to-r from-[#e6c866] to-[#c9a227] bg-clip-text hero-elegance">
-                  Essentials
-                </span>
-              </h1>
+          <div class="grid items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
+            <div class="space-y-8">
+              <div class="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-goldLight">
+                <span class="h-2 w-2 rounded-full bg-goldLight"></span>
+                @extrastore
+              </div>
 
-              <p class="mt-6 max-w-xl text-base leading-7 text-white/80 sm:text-lg">
-                Practical, stylish finds for daily life. Discover umbrellas, travel gear, and useful products that make every day feel easier.
+              <div class="space-y-3">
+                <h1 class="text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+                  We’re more than a store.
+                </h1>
+                <p class="max-w-2xl text-4xl font-semibold leading-tight text-white/95 sm:text-5xl lg:text-6xl">
+                  We’re your <span class="text-goldLight">everyday essential.</span>
+                </p>
+              </div>
+
+              <p class="max-w-xl text-base leading-7 text-white/80 sm:text-lg">
+                Convenience, comfort, reliability, style, and value in one clean place. Extra Store keeps everyday essentials easy to shop and easy to love.
               </p>
 
-              <div class="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-8">
-                <div class="flex items-center gap-4">
-                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white/10 text-lg">◫</span>
+              <div class="space-y-3">
+                <div class="flex items-start gap-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg">✦</span>
                   <div>
-                    <div class="text-xl font-bold text-white">10K+</div>
-                    <div class="text-xs text-white/65">Orders Delivered</div>
+                    <div class="text-lg font-semibold text-white">Convenience</div>
+                    <div class="text-sm leading-6 text-white/70">Essentials that make your day easier.</div>
                   </div>
                 </div>
-                <div class="flex items-center gap-4">
-                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white/10 text-lg text-goldLight">★</span>
+                <div class="flex items-start gap-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg">♡</span>
                   <div>
-                    <div class="text-xl font-bold text-white">4.9</div>
-                    <div class="text-xs text-white/65">Store Rating</div>
+                    <div class="text-lg font-semibold text-white">Comfort</div>
+                    <div class="text-sm leading-6 text-white/70">Products that bring ease, relaxation, and peace.</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg">✓</span>
+                  <div>
+                    <div class="text-lg font-semibold text-white">Reliability</div>
+                    <div class="text-sm leading-6 text-white/70">Quality you can trust, always.</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg">✧</span>
+                  <div>
+                    <div class="text-lg font-semibold text-white">Style</div>
+                    <div class="text-sm leading-6 text-white/70">Everyday essentials that fit your lifestyle.</div>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-lg">🎁</span>
+                  <div>
+                    <div class="text-lg font-semibold text-white">Value</div>
+                    <div class="text-sm leading-6 text-white/70">Great essentials, fair prices.</div>
                   </div>
                 </div>
               </div>
 
-              <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <button class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#e6c866] to-[#a9821f] px-8 py-4 text-sm font-semibold text-[#4a0e17] transition hover:brightness-105">
-                  Explore Collection →
-                </button>
-                <button class="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/5 px-8 py-4 text-sm font-medium text-white transition hover:bg-white/10">
-                  ▷ Browse Latest Drops
-                </button>
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <a href="#featured-products" data-scroll-target="featured-products" class="inline-flex items-center justify-center rounded-full bg-[#f0d58a] px-8 py-4 text-sm font-semibold text-[#4a0e17] transition hover:brightness-105">
+                  Shop Essentials
+                </a>
+                <a href="https://wa.me/2347068905261" target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/5 px-8 py-4 text-sm font-medium text-white transition hover:bg-white/10">
+                  WhatsApp Us
+                </a>
               </div>
+
+              <p class="text-sm font-semibold uppercase tracking-[0.24em] text-goldLight/90">
+                Luxury & Swift.
+              </p>
             </div>
 
-            <div class="relative flex min-h-[280px] items-end justify-center lg:min-h-[520px]">
+            <div class="relative flex min-h-[320px] items-end justify-center lg:min-h-[620px]">
               <div class="absolute right-6 top-10 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(230,200,102,0.35),transparent_70%)] blur-xl sm:right-16"></div>
               <div class="absolute bottom-6 h-20 w-[90%] rounded-full border border-goldLight/40 bg-[radial-gradient(ellipse_at_center,#7a1f2b_0%,#5c141e_60%,transparent_75%)]"></div>
               <div class="umbrella-shadow wall"></div>
               <div class="umbrella-shadow floor"></div>
-              <div class="relative z-10 w-[95%] max-w-[40rem] transform-gpu transition-transform duration-300 hover:scale-105 drop-shadow-[0_50px_70px_rgba(0,0,0,0.45)] sm:w-[92%] lg:max-w-[46rem]">
-                <canvas
-                  id="heroFrameCanvas"
-                  class="pointer-events-none absolute inset-0 z-10 h-full w-full opacity-0 transition-opacity duration-300"
-                  aria-hidden="true"
-                ></canvas>
+              <div class="relative z-10 w-[100%] max-w-[60rem] drop-shadow-[0_50px_70px_rgba(0,0,0,0.45)]">
                 <img
-                  id="heroFrameFallback"
                   src="assets/tfgh.png"
                   alt="Featured product"
-                  class="relative z-0 block h-auto w-full object-contain transition-opacity duration-300"
+                  class="block h-auto w-full object-contain"
                 >
               </div>
             </div>
@@ -348,56 +404,95 @@
         </div>
       </section>
 
-      <section class="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+      <section id="featured-products" class="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
         <div class="mx-auto max-w-screen-2xl">
-          <h2 class="text-center font-serif text-3xl text-ink sm:text-4xl">Best Sellers at Extra Store</h2>
-          <div class="mt-8 grid gap-6 lg:grid-cols-3">
-            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">Browse the collection</p>
+              <h2 class="mt-2 font-serif text-3xl text-ink sm:text-4xl">Best Sellers at Extra Store</h2>
+              <p class="mt-3 text-sm leading-6 text-muted">Search, filter, and sort to find the exact umbrella you want.</p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-3 lg:w-[42rem]">
+              <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
+                <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Search</span>
+                <input id="productSearch" type="search" placeholder="Search products" class="w-full bg-transparent text-sm outline-none placeholder:text-muted">
+              </label>
+              <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
+                <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Color</span>
+                <select id="productColorFilter" class="w-full bg-transparent text-sm outline-none">
+                  <option value="all">All colors</option>
+                  <option value="Red">Red</option>
+                  <option value="Green">Green</option>
+                  <option value="Blue">Blue</option>
+                </select>
+              </label>
+              <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
+                <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Sort</span>
+                <select id="productSort" class="w-full bg-transparent text-sm outline-none">
+                  <option value="featured">Featured</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name">Name: A to Z</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="mt-5 flex items-center justify-between gap-4 text-sm text-muted">
+            <span id="productResultsCount">3 products</span>
+            <button type="button" id="clearProductFilters" class="font-semibold text-[#7a1f2b] transition hover:text-[#5c141e]">
+              Clear filters
+            </button>
+          </div>
+          <div id="productGrid" class="mt-8 grid gap-6 lg:grid-cols-3">
+            <article data-product-card data-product-name="Classic Red Auto Umbrella" data-product-category="Travel Essential" data-product-color="Red" data-product-price="18.14" data-product-tags="red compact travel umbrella" data-sort-order="1" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
               <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/pink.jpg" alt="Red umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/pink.jpg" data-product-name="Classic Red Auto Umbrella" data-product-price="$18.14" data-product-color="Red">
+                <img src="assets/pink.jpg" alt="Red umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-red" data-product-image="assets/pink.jpg" data-product-name="Classic Red Auto Umbrella" data-product-price="$18.14" data-product-color="Red">
               </div>
               <div class="p-5">
                 <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
                 <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Classic Red Auto Umbrella</h3>
                 <div class="mt-2 text-base font-semibold text-ink">$18.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                <button type="button" data-add-to-cart data-product-id="umbrella-red" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
                   Add to Cart
                 </button>
               </div>
             </article>
-            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+            <article data-product-card data-product-name="Green Windproof Umbrella" data-product-category="Travel Essential" data-product-color="Green" data-product-price="23.19" data-product-tags="green windproof umbrella" data-sort-order="2" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
               <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/red.jpg" alt="Green umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/red.jpg" data-product-name="Green Windproof Umbrella" data-product-price="$23.19" data-product-color="Green">
+                <img src="assets/red.jpg" alt="Green umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-green" data-product-image="assets/red.jpg" data-product-name="Green Windproof Umbrella" data-product-price="$23.19" data-product-color="Green">
               </div>
               <div class="p-5">
                 <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
                 <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Green Windproof Umbrella</h3>
                 <div class="mt-2 text-base font-semibold text-ink">$23.19 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                <button type="button" data-add-to-cart data-product-id="umbrella-green" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
                   Add to Cart
                 </button>
               </div>
             </article>
-            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+            <article data-product-card data-product-name="Blue Compact Auto Umbrella" data-product-category="Travel Essential" data-product-color="Blue" data-product-price="27.14" data-product-tags="blue compact auto umbrella" data-sort-order="3" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
               <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/blue.jpg" alt="Blue umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/blue.jpg" data-product-name="Blue Compact Auto Umbrella" data-product-price="$27.14" data-product-color="Blue">
+                <img src="assets/blue.jpg" alt="Blue umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-blue" data-product-image="assets/blue.jpg" data-product-name="Blue Compact Auto Umbrella" data-product-price="$27.14" data-product-color="Blue">
               </div>
               <div class="p-5">
                 <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
                 <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Blue Compact Auto Umbrella</h3>
                 <div class="mt-2 text-base font-semibold text-ink">$27.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                <button type="button" data-add-to-cart data-product-id="umbrella-blue" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
                   Add to Cart
                 </button>
               </div>
             </article>
           </div>
+          <div id="productResultsEmpty" class="hidden mt-8 rounded-[1.25rem] border border-dashed border-line bg-white p-8 text-center text-sm text-muted">
+            No products match your search. Try a different color or keyword.
+          </div>
         </div>
       </section>
 
-      <section class="w-full px-4 py-4 sm:px-6 lg:px-8">
+      <section id="new-arrivals" class="w-full px-4 py-4 sm:px-6 lg:px-8">
         <div class="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-line lg:grid-cols-2">
-          <div class="flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#f6ecd9] to-[#f0e4d0] p-0">
+          <div class="flex aspect-square w-full items-center justify-center overflow-hidden bg-[#f4efe8] p-0">
             <img src="assets/green.jpg" alt="Umbrella product view" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
           </div>
           <div class="flex aspect-square w-full items-center bg-white px-6 py-8 text-[#7a1f2b] sm:px-10 lg:px-14">
@@ -494,10 +589,10 @@
             </div>
 
             <div class="mt-8 flex flex-col gap-4 sm:flex-row">
-              <button class="inline-flex items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+              <button type="button" data-add-to-cart data-product-id="umbrella-red" class="inline-flex items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
                 Add to Cart
               </button>
-              <button class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#5c141e]">
+              <button type="button" data-buy-now data-product-id="umbrella-red" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#5c141e]">
                 Buy Now
               </button>
             </div>
@@ -506,13 +601,13 @@
       </section>
 
       <!-- Product detail modal (hidden) -->
-      <div class="detail-modal" id="productModal" aria-hidden="true">
+      <div class="detail-modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true">
         <div class="detail-modal-panel p-6 lg:p-8">
           <button class="detail-close" id="detailClose">×</button>
           <div class="grid gap-6 lg:grid-cols-2">
             <div>
-              <img id="detailMain" class="detail-main-image" src="assets/red-product-transparent-v4.png" alt="Product">
-              <div class="detail-gallery mt-4" id="detailThumbs" role="list">
+              <img id="detailMainImage" class="detail-main-image" src="assets/red-product-transparent-v4.png" alt="Product">
+              <div class="detail-gallery mt-4" id="detailGallery" role="list">
               </div>
             </div>
             <div>
@@ -520,16 +615,29 @@
               <h3 id="detailTitle" class="font-serif text-2xl text-ink mb-2">Charging Intelligence Electric Umbrella</h3>
               <div id="detailPrice" class="text-2xl font-bold text-[#7a1f2b]">$39.99</div>
               <p id="detailDesc" class="mt-4 text-sm text-muted">Full description goes here.</p>
+              <p class="mt-4 text-sm leading-6 text-ink/80">
+                Built for daily rain, travel, and easy carry, this compact umbrella combines a sturdy frame with a polished finish.
+              </p>
 
               <div class="mt-6">
                 <div class="flex items-center gap-3">
-                  <div class="qty-box" id="qtyBox">
+                  <div class="qty-box">
                     <button class="qty-btn" id="qtyDec">−</button>
-                    <div class="qty-value" id="qtyValue">1</div>
+                    <div class="qty-value" id="detailQty">1</div>
                     <button class="qty-btn" id="qtyInc">＋</button>
                   </div>
-                  <button id="detailAdd" class="inline-flex items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-6 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">Add to Cart</button>
-                  <button id="detailRemove" class="inline-flex items-center justify-center rounded-full border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hidden">Remove</button>
+                </div>
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <button id="detailAdd" class="inline-flex flex-1 items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-6 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">Add to Cart</button>
+                  <button id="detailRemove" class="inline-flex flex-1 items-center justify-center rounded-full border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hidden">Remove</button>
+                </div>
+                <div id="detailCartLinks" class="mt-3 hidden flex flex-col gap-3 sm:flex-row">
+                  <a href="cart.html" class="inline-flex flex-1 items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#fff2f2]">
+                    View Cart
+                  </a>
+                  <a href="checkout.html" class="inline-flex flex-1 items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#5c141e]">
+                    Checkout
+                  </a>
                 </div>
               </div>
             </div>
@@ -572,202 +680,57 @@
       <section class="w-full px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
         <div class="mx-auto flex max-w-screen-2xl flex-col gap-5 rounded-[1.6rem] bg-gradient-to-r from-[#7a1f2b] to-[#5c141e] px-6 py-8 text-white sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-10">
           <h3 class="font-serif text-2xl sm:text-3xl">Stay in the Loop</h3>
-          <form class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <input class="w-full rounded-full bg-white px-5 py-3 text-sm text-ink outline-none placeholder:text-muted sm:w-80" type="email" placeholder="Enter your email">
-            <button class="rounded-full bg-ink px-6 py-3 text-sm font-medium text-white transition hover:bg-black/80" type="button">Join</button>
+          <form id="newsletterForm" class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <label class="sr-only" for="newsletterEmail">Email address</label>
+            <input id="newsletterEmail" class="w-full rounded-full bg-white px-5 py-3 text-sm text-ink outline-none placeholder:text-muted sm:w-80" type="email" placeholder="Email address">
+            <button class="rounded-full bg-ink px-6 py-3 text-sm font-medium text-white transition hover:bg-black/80" type="submit">Join</button>
           </form>
         </div>
       </section>
     </main>
 
-    <footer class="w-full bg-[#4a0e17] text-[#f6ecd9]">
+    <footer id="site-contact" class="w-full bg-[#2b0a0f] text-[#f6ecd9]">
       <div class="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="grid gap-8 lg:grid-cols-[1.4fr_1fr_1fr]">
+        <div class="grid gap-8 lg:grid-cols-[1.15fr_0.95fr_0.9fr]">
           <div>
-            <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-3 h-8 w-auto object-contain">
-            <p class="mb-2 text-sm text-[#d9c49a]">Everyday essentials, smart finds, and practical products for life on the move.</p>
-            <p class="text-sm text-[#d9c49a]">hello@extrastore.com</p>
+            <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-4 h-8 w-auto object-contain">
+            <p class="max-w-md text-sm leading-6 text-[#d9c49a]">
+              Everyday essentials, smart finds, and practical products for life on the move.
+            </p>
+            <div class="mt-5 space-y-2 text-sm text-[#f6ecd9]">
+              <p><span class="text-[#d9c49a]">Email:</span> hello@extrastore.com</p>
+              <p><a class="transition hover:text-white" href="tel:+2347068905261"><span class="text-[#d9c49a]">Call:</span> 07068905261</a></p>
+              <p><a class="transition hover:text-white" href="https://wa.me/2347068905261" target="_blank" rel="noreferrer"><span class="text-[#d9c49a]">WhatsApp:</span> 07068905261</a></p>
+            </div>
           </div>
           <div>
-            <h4 class="mb-3 text-sm font-semibold text-white">Menu</h4>
-            <ul class="space-y-2 text-sm text-[#d9c49a]">
-              <li>Shop</li>
-              <li>About</li>
-              <li>Blog</li>
+            <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Connect With Us</h4>
+            <ul class="space-y-3 text-sm text-[#d9c49a]">
+              <li><a class="transition hover:text-white" href="https://www.instagram.com/extra_storerix/" target="_blank" rel="noreferrer">Instagram: @extra_storerix</a></li>
+              <li><a class="transition hover:text-white" href="https://www.snapchat.com/add/extra_store" target="_blank" rel="noreferrer">Snapchat: @extra_store</a></li>
+              <li><a class="transition hover:text-white" href="https://www.tiktok.com/@extras_store" target="_blank" rel="noreferrer">TikTok: @extras_store</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-3 text-sm font-semibold text-white">Company</h4>
-            <ul class="space-y-2 text-sm text-[#d9c49a]">
-              <li>Privacy</li>
-              <li>Terms &amp; Conditions</li>
-              <li>Contact</li>
+            <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Quick Links</h4>
+            <ul class="space-y-3 text-sm text-[#d9c49a]">
+              <li><a class="transition hover:text-white" href="#featured-products" data-scroll-target="featured-products">Shop</a></li>
+              <li><a class="transition hover:text-white" href="cart.html">Cart</a></li>
+              <li><a class="transition hover:text-white" href="checkout.html">Checkout</a></li>
             </ul>
           </div>
         </div>
-        <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76]">
-          © 2026 Extra Store. All rights reserved.
+        <div class="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76] sm:flex-row sm:items-center sm:justify-between">
+          <span>Luxury & Swift.</span>
+          <span>© 2026 Extra Store. All rights reserved.</span>
         </div>
       </div>
     </footer>
   </div>
 
-  <div id="productDetailModal" class="detail-modal" aria-hidden="true">
-    <div class="detail-modal-panel">
-      <button type="button" class="detail-close" aria-label="Close product details">×</button>
-      <div class="grid gap-0 lg:grid-cols-2">
-        <div class="bg-[#f8f1eb] p-4 sm:p-6">
-          <img id="detailMainImage" class="detail-main-image" src="assets/red-product-clean.png" alt="Product image">
-          <div id="detailGallery" class="detail-gallery">
-            <div class="detail-thumb active"><img src="assets/red-product-clean.png" alt="Product thumbnail 1"></div>
-            <div class="detail-thumb"><img src="assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg" alt="Product thumbnail 2"></div>
-            <div class="detail-thumb"><img src="assets/green.jpg" alt="Product thumbnail 3"></div>
-            <div class="detail-thumb"><img src="assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg" alt="Product thumbnail 4"></div>
-            <div class="detail-thumb"><img src="assets/red-product-transparent-v4.png" alt="Product thumbnail 5"></div>
-          </div>
-        </div>
-
-        <div class="p-5 sm:p-7 lg:p-8">
-          <div class="mb-3 inline-flex items-center rounded-full border border-[#e8c8c8] bg-[#fff2f2] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">
-            Best Seller
-          </div>
-          <h2 id="detailTitle" class="font-serif text-3xl leading-tight text-ink sm:text-4xl">Charging Intelligence Electric Umbrella</h2>
-          <div class="mt-4 flex items-center gap-3 text-[#7a1f2b]">
-            <span id="detailPrice" class="text-2xl font-bold">$18.14</span>
-            <span class="text-sm text-muted line-through">$29.99</span>
-          </div>
-          <div class="mt-4 text-black text-center">
-            <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-7 text-left">
-              <li><strong>Fully-automatic operation with intelligent charging:</strong> This automatic anti-rebound umbrella features a fully-automatic control system with intelligent charging, offering effortless opening and closing with just a button press. Ideal for quick protection in sudden rain or sun.</li>
-              <li><strong>Compact 3-folding design for easy portability:</strong> The three-folding umbrella collapses into a compact size of 10 x 10 x 10 cm, making it easy to carry in bags or backpacks. Perfect for daily commutes or travel without adding bulk.</li>
-              <li><strong>Windproof and UV-protective with durable frame:</strong> Built with a metal-fiber composite frame and 8K frame structure, this umbrella resists wind and rebound. The 190T PONGEE protection layer ensures strong UV and rain resistance for reliable outdoor use.</li>
-              <li><strong>Large 55–61cm radius for full coverage:</strong> With a wide 55–61cm radius, this umbrella provides ample coverage for adults. The spacious design keeps you dry and shaded in both sunny and rainy conditions.</li>
-              <li><strong>Available in multiple stylish colors:</strong> Choose from a variety of colors: Wutong Beige, Black, Blue, Green, Grey, Pink, Sky Blue. Each color offers a unique look, allowing you to match your style while staying protected.</li>
-              <li><strong>High-quality nylon material with no harmful chemicals:</strong> Made from nylon fabric with no high-concerned chemicals, this umbrella ensures safety and durability. The material is lightweight yet strong, designed for long-term use in all weather.</li>
-              <li><strong>Lightweight and sold as one piece per pack:</strong> Weighing only 0.600 kg, this umbrella is ultra-light and easy to carry. Sold as 1 piece per pack, it’s perfect for individual users seeking a reliable, all-in-one rain and sun solution.</li>
-            </ul>
-          </div>
-
-          <div class="mt-6">
-            <div class="mb-2 text-sm font-semibold text-ink">Color</div>
-            <div id="detailColor" class="inline-flex items-center rounded-full border border-[#e8d6d2] bg-[#fdf0ef] px-3 py-1 text-sm font-medium text-[#7a1f2b]">Red</div>
-          </div>
-
-          <div class="mt-6">
-            <div class="mb-2 text-sm font-semibold text-ink">Quantity</div>
-            <div class="qty-box">
-              <button type="button" class="qty-btn" data-qty-action="decrease">−</button>
-              <span id="detailQty" class="qty-value">1</span>
-              <button type="button" class="qty-btn" data-qty-action="increase">+</button>
-            </div>
-          </div>
-
-          <div class="mt-8 space-y-3">
-            <button id="addToCartBtn" type="button" class="w-full rounded-full border-2 border-[#7a1f2b] bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
-              Add to Cart
-            </button>
-            <div id="cartActions" class="hidden flex gap-3">
-              <button id="removeFromCartBtn" type="button" class="flex-1 rounded-full border border-[#7a1f2b] bg-[#fff2f2] px-6 py-3 text-sm font-semibold text-[#7a1f2b]">
-                Remove from Cart
-              </button>
-              <button id="keepShoppingBtn" type="button" class="flex-1 rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold text-white">
-                Keep Shopping
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-8 rounded-[1rem] border border-[#f0d8d4] bg-[#fff8f7] p-4">
-            <div class="mb-2 text-sm font-semibold text-[#7a1f2b]">Why shoppers love it</div>
-            <ul class="space-y-2 text-sm leading-6 text-[#7a1f2b]/90">
-              <li>• Fully automatic open/close for everyday convenience</li>
-              <li>• Windproof, lightweight, and compact for travel</li>
-              <li>• UV protection and durable rain-ready fabric</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const modal = document.getElementById('productDetailModal');
-    const detailMainImage = document.getElementById('detailMainImage');
-    const detailTitle = document.getElementById('detailTitle');
-    const detailPrice = document.getElementById('detailPrice');
-    const detailColor = document.getElementById('detailColor');
-    const addToCartBtn = document.getElementById('addToCartBtn');
-    const cartActions = document.getElementById('cartActions');
-    const removeFromCartBtn = document.getElementById('removeFromCartBtn');
-    const keepShoppingBtn = document.getElementById('keepShoppingBtn');
-    const detailQty = document.getElementById('detailQty');
-    const closeBtn = document.querySelector('.detail-close');
-
-    let currentQty = 1;
-
-    function openProductDetails(img) {
-      const name = img.dataset.productName || 'Charging Intelligence Electric Umbrella';
-      const price = img.dataset.productPrice || '$18.14';
-      const color = img.dataset.productColor || 'Red';
-      const image = img.dataset.productImage || img.src;
-
-      detailTitle.textContent = name;
-      detailPrice.textContent = price;
-      detailColor.textContent = color;
-      detailMainImage.src = image;
-      currentQty = 1;
-      detailQty.textContent = String(currentQty);
-      addToCartBtn.textContent = 'Add to Cart';
-      cartActions.classList.add('hidden');
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeProductDetails() {
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    document.querySelectorAll('.product-detail-trigger').forEach((img) => {
-      img.addEventListener('click', () => openProductDetails(img));
-    });
-
-    closeBtn.addEventListener('click', closeProductDetails);
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) closeProductDetails();
-    });
-
-    document.querySelectorAll('[data-qty-action]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const action = button.dataset.qtyAction;
-        currentQty = action === 'increase' ? currentQty + 1 : Math.max(1, currentQty - 1);
-        detailQty.textContent = String(currentQty);
-      });
-    });
-
-    addToCartBtn.addEventListener('click', () => {
-      addToCartBtn.textContent = 'Added to Cart';
-      cartActions.classList.remove('hidden');
-    });
-
-    removeFromCartBtn.addEventListener('click', () => {
-      addToCartBtn.textContent = 'Add to Cart';
-      cartActions.classList.add('hidden');
-      currentQty = 1;
-      detailQty.textContent = '1';
-    });
-
-    keepShoppingBtn.addEventListener('click', closeProductDetails);
-
-    document.querySelectorAll('.detail-thumb').forEach((thumb) => {
-      thumb.addEventListener('click', () => {
-        document.querySelectorAll('.detail-thumb').forEach((item) => item.classList.remove('active'));
-        thumb.classList.add('active');
-        const img = thumb.querySelector('img');
-        detailMainImage.src = img.src;
-      });
-    });
-  </script>
-  <script src="assets/js/hero-scroll-frames.js" defer></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/a11y.js"></script>
+  <script src="assets/js/navigation.js" defer></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>
