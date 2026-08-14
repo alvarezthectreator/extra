@@ -9,9 +9,8 @@
       color: 'Red',
       category: 'Travel Essential',
       images: [
-        'assets/pink.jpg',
         'assets/red-product-clean.png',
-        'assets/red-product-transparent-v4.png'
+        'assets/pink.jpg'
       ],
       description:
         'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.'
