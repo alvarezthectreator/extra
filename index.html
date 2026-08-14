@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extra Store — Everyday Essentials</title>
+  <style>
+    @font-face {
+      font-family: 'Sesbania';
+      src: url('assets/fonts/sesbania-regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Sesbania';
+      src: url('assets/fonts/sesbania-italic.ttf') format('truetype');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+    .hero-noise {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.25' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.34'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23m)' opacity='0.22'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 140px 140px, 240px 240px;
+      mix-blend-mode: overlay;
+      opacity: 0.34;
+      pointer-events: none;
+    }
+    .hero-elegance {
+      font-family: 'Sesbania', 'Alex Brush', cursive !important;
+    }
+    /* Umbrella cast shadows: wall and floor layers to preserve texture through multiply blend */
+    .umbrella-shadow { position: absolute; pointer-events: none; mix-blend-mode: multiply; filter: blur(32px); opacity: 0.9; transform-origin: center; z-index: 8; }
+    .umbrella-shadow.wall { right: 6%; top: 8%; width: 34%; height: 34%; background: radial-gradient(closest-side, rgba(0,0,0,0.95), rgba(0,0,0,0.52) 55%, transparent 76%); transform: skewX(-18deg) rotate(-6deg) scaleY(0.9); }
+    .umbrella-shadow.floor { left: 50%; bottom: 4%; width: 72%; height: 14%; background: radial-gradient(ellipse at center, rgba(0,0,0,0.95), rgba(0,0,0,0.45) 45%, transparent 85%); transform: translateX(-50%) skewX(-12deg) scaleY(0.45); filter: blur(40px); opacity: 1; }
+    @media (min-width:1024px){ .umbrella-shadow.wall { right:8%; top:6%; width:28%; height:36%; } .umbrella-shadow.floor { left:65%; bottom:6%; width:48%; height:18%; transform: translateX(-50%) skewX(-12deg) scaleY(0.48); } }
+
+    .product-detail-trigger { cursor: pointer; }
+    .detail-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(19, 12, 12, 0.62);
+      backdrop-filter: blur(8px);
+    }
+    .detail-modal.open { display: flex; }
+    .detail-modal-panel {
+      width: min(1100px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 1.5rem;
+      background: #fff;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.28);
+      position: relative;
+    }
+    .detail-close {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      z-index: 2;
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(122, 31, 43, 0.2);
+      background: rgba(255,255,255,0.9);
+      color: #7a1f2b;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .detail-gallery {
+      display: flex;
+      overflow-x: auto;
+      gap: 0.75rem;
+      padding: 0.75rem 0.5rem 0.25rem;
+      scrollbar-width: thin;
+    }
+    .detail-thumb {
+      width: 86px;
+      height: 86px;
+      flex: 0 0 86px;
+      border-radius: 0.9rem;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: #f5f0ec;
+    }
+    .detail-thumb.active {
+      border-color: #7a1f2b;
+    }
+    .detail-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .detail-main-image {
+      width: 100%;
+      height: 420px;
+      object-fit: contain;
+      background: linear-gradient(135deg, #f4efe8 0%, #d9d7cf 100%);
+      border-radius: 1rem;
+      display: block;
+    }
+    .qty-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(122, 31, 43, 0.2);
+      border-radius: 999px;
+      padding: 0.35rem 0.6rem;
+      background: white;
+    }
+    .qty-btn {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(122, 31, 43, 0.2);
+      background: #fff;
+      color: #7a1f2b;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .qty-value {
+      min-width: 1.25rem;
+      text-align: center;
+      font-weight: 700;
+      color: #7a1f2b;
+    }
+    /* Override: force key product/feature/modal text to black where needed */
+    .detail-modal-panel,
+    .detail-modal-panel *,
+    .product-features,
+    .product-features * {
+      color: #000 !important;
+    }
+    @media (max-width: 640px) {
+      .detail-main-image { height: 290px; }
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: "#fffdf8",
+            blush: "#f6ecd9",
+            terracotta: "#7a1f2b",
+            terracottaDark: "#5c141e",
+            gold: "#c9a227",
+            goldLight: "#e6c866",
+            ink: "#2a1f1c",
+            muted: "#8c7a66",
+            line: "#ecdfc2"
+          },
+          fontFamily: {
+            sans: ["Poppins", "Arial", "sans-serif"],
+            serif: ["Playfair Display", "Georgia", "serif"],
+            script: ["Alex Brush", "cursive"]
+          },
+          boxShadow: {
+            glow: "0 30px 60px rgba(0,0,0,0.24)"
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen w-full overflow-x-hidden bg-cream text-ink font-sans">
+  <div class="w-full">
+    <header class="w-full border-b border-goldLight/70 bg-cream/95 backdrop-blur">
+      <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div class="flex justify-center lg:justify-start">
+          <img
+            src="assets/extra-store-logo.png"
+            alt="Extra Store logo"
+            class="h-6 w-auto max-w-[5.5rem] object-contain sm:h-7 lg:h-8"
+          >
+        </div>
+        <nav class="flex justify-center">
+          <ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink sm:gap-x-8">
+            <li><a class="transition hover:text-terracottaDark" href="#">Shop</a></li>
+            <li><a class="transition hover:text-terracottaDark" href="#">New Arrivals</a></li>
+            <li><a class="transition hover:text-terracottaDark" href="#">About</a></li>
+            <li><a class="transition hover:text-terracottaDark" href="#">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="flex items-center justify-center gap-4 lg:justify-end">
+          <span class="inline-block h-4 w-4 rounded-full border border-ink/80"></span>
+          <span class="inline-block h-4 w-4 rounded-full border border-ink/80"></span>
+          <button class="rounded-full bg-gold px-6 py-2 text-sm font-semibold text-terracottaDark transition hover:brightness-105">
+            Shop Now
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="w-full">
+      <section id="hero-scroll-section" class="relative w-full overflow-hidden bg-[radial-gradient(120%_160%_at_80%_10%,#7a1420_0%,#4a0e17_55%,#3a0a11_100%)] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div class="hero-noise absolute inset-0"></div>
+        <div class="mx-auto max-w-screen-2xl relative overflow-hidden rounded-[2rem] px-5 py-6 text-white shadow-glow sm:px-8 sm:py-8 lg:px-14 lg:py-14">
+          <div class="relative z-10">
+          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div class="text-xs font-semibold uppercase tracking-[0.18em] text-goldLight">Extra Store 2026</div>
+            <div class="flex items-center gap-3 self-start rounded-full bg-white/5 px-4 py-2 md:self-auto">
+              <div class="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-lg">◈</div>
+              <div>
+                <div class="text-sm font-semibold">Premium</div>
+                <div class="text-xs text-white/65">Quality Assured</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+            <div>
+              <h1 class="text-5xl font-semibold leading-none text-goldLight sm:text-6xl lg:text-7xl">
+                Everyday
+                <span class="mt-1 block font-script text-7xl font-normal leading-none text-transparent sm:text-8xl lg:text-[6.5rem] bg-gradient-to-r from-[#e6c866] to-[#c9a227] bg-clip-text hero-elegance">
+                  Essentials
+                </span>
+              </h1>
+
+              <p class="mt-6 max-w-xl text-base leading-7 text-white/80 sm:text-lg">
+                Practical, stylish finds for daily life. Discover umbrellas, travel gear, and useful products that make every day feel easier.
+              </p>
+
+              <div class="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-8">
+                <div class="flex items-center gap-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white/10 text-lg">◫</span>
+                  <div>
+                    <div class="text-xl font-bold text-white">10K+</div>
+                    <div class="text-xs text-white/65">Orders Delivered</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <span class="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-white/10 text-lg text-goldLight">★</span>
+                  <div>
+                    <div class="text-xl font-bold text-white">4.9</div>
+                    <div class="text-xs text-white/65">Store Rating</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <button class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#e6c866] to-[#a9821f] px-8 py-4 text-sm font-semibold text-[#4a0e17] transition hover:brightness-105">
+                  Explore Collection →
+                </button>
+                <button class="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/5 px-8 py-4 text-sm font-medium text-white transition hover:bg-white/10">
+                  ▷ Browse Latest Drops
+                </button>
+              </div>
+            </div>
+
+            <div class="relative flex min-h-[280px] items-end justify-center lg:min-h-[520px]">
+              <div class="absolute right-6 top-10 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(230,200,102,0.35),transparent_70%)] blur-xl sm:right-16"></div>
+              <div class="absolute bottom-6 h-20 w-[90%] rounded-full border border-goldLight/40 bg-[radial-gradient(ellipse_at_center,#7a1f2b_0%,#5c141e_60%,transparent_75%)]"></div>
+              <div class="umbrella-shadow wall"></div>
+              <div class="umbrella-shadow floor"></div>
+              <div class="relative z-10 w-[95%] max-w-[40rem] transform-gpu transition-transform duration-300 hover:scale-105 drop-shadow-[0_50px_70px_rgba(0,0,0,0.45)] sm:w-[92%] lg:max-w-[46rem]">
+                <canvas
+                  id="heroFrameCanvas"
+                  class="pointer-events-none absolute inset-0 z-10 h-full w-full opacity-0 transition-opacity duration-300"
+                  aria-hidden="true"
+                ></canvas>
+                <img
+                  id="heroFrameFallback"
+                  src="assets/tfgh.png"
+                  alt="Featured product"
+                  class="relative z-0 block h-auto w-full object-contain transition-opacity duration-300"
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10 grid gap-5 rounded-[1.5rem] border border-white/10 bg-white/5 p-5 sm:grid-cols-2 lg:grid-cols-4 lg:p-7">
+            <div class="flex items-center gap-4">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">▣</span>
+              <div>
+                <div class="text-sm font-semibold text-white">Free Shipping</div>
+                <div class="text-xs text-white/60">On orders over $100</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">⟳</span>
+              <div>
+                <div class="text-sm font-semibold text-white">Easy Returns</div>
+                <div class="text-xs text-white/60">30-day return policy</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">▤</span>
+              <div>
+                <div class="text-sm font-semibold text-white">Secure Payment</div>
+                <div class="text-xs text-white/60">100% protected</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
+              <div>
+                <div class="text-sm font-semibold text-white">24/7 Support</div>
+                <div class="text-xs text-white/60">We're here to help</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+        <div class="mx-auto max-w-5xl text-center">
+          <h2 class="font-serif text-3xl text-ink sm:text-4xl">Why shoppers choose Extra Store</h2>
+          <p class="mx-auto mt-3 max-w-2xl text-sm text-muted sm:text-base">
+            Curated essentials that are practical, polished, and ready for everyday use.
+          </p>
+
+          <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <div class="flex flex-col items-center gap-3 text-sm text-ink">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">✿</div>
+              Portable Design
+            </div>
+            <div class="flex flex-col items-center gap-3 text-sm text-ink">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">⊘</div>
+              Weather Ready
+            </div>
+            <div class="flex flex-col items-center gap-3 text-sm text-ink">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◌</div>
+              Easy to Carry
+            </div>
+            <div class="flex flex-col items-center gap-3 text-sm text-ink">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◍</div>
+              Quality Finish
+            </div>
+            <div class="flex flex-col items-center gap-3 text-sm text-ink">
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◐</div>
+              Reliable Build
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+        <div class="mx-auto max-w-screen-2xl">
+          <h2 class="text-center font-serif text-3xl text-ink sm:text-4xl">Best Sellers at Extra Store</h2>
+          <div class="mt-8 grid gap-6 lg:grid-cols-3">
+            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
+                <img src="assets/pink.jpg" alt="Red umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/pink.jpg" data-product-name="Classic Red Auto Umbrella" data-product-price="$18.14" data-product-color="Red">
+              </div>
+              <div class="p-5">
+                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
+                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Classic Red Auto Umbrella</h3>
+                <div class="mt-2 text-base font-semibold text-ink">$18.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
+                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
+                <img src="assets/red.jpg" alt="Green umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/red.jpg" data-product-name="Green Windproof Umbrella" data-product-price="$23.19" data-product-color="Green">
+              </div>
+              <div class="p-5">
+                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
+                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Green Windproof Umbrella</h3>
+                <div class="mt-2 text-base font-semibold text-ink">$23.19 <span class="text-xs font-normal text-muted">1 piece</span></div>
+                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+            <article class="overflow-hidden rounded-[1.2rem] border border-line bg-white">
+              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
+                <img src="assets/blue.jpg" alt="Blue umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product-image="assets/blue.jpg" data-product-name="Blue Compact Auto Umbrella" data-product-price="$27.14" data-product-color="Blue">
+              </div>
+              <div class="p-5">
+                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
+                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Blue Compact Auto Umbrella</h3>
+                <div class="mt-2 text-base font-semibold text-ink">$27.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
+                <button class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                  Add to Cart
+                </button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 py-4 sm:px-6 lg:px-8">
+        <div class="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-line lg:grid-cols-2">
+          <div class="flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#f6ecd9] to-[#f0e4d0] p-0">
+            <img src="assets/green.jpg" alt="Umbrella product view" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
+          </div>
+          <div class="flex aspect-square w-full items-center bg-white px-6 py-8 text-[#7a1f2b] sm:px-10 lg:px-14">
+            <div class="space-y-4">
+              <h3 class="max-w-md font-serif text-2xl leading-tight text-[#7a1f2b] sm:text-3xl">
+                5 things to look for before you buy a folding umbrella
+              </h3>
+              <ul class="space-y-3 text-sm leading-6 text-[#7a1f2b]">
+                <li><strong>Easy one-button open and close:</strong> Choose products that feel simple and reliable in daily use, especially when weather changes fast.</li>
+                <li><strong>Compact folding shape:</strong> A good umbrella should fit easily in your bag, backpack, or car without taking up space.</li>
+                <li><strong>Wind-resistant frame:</strong> Look for a durable structure that stays dependable during sudden gusts and heavy rain.</li>
+                <li><strong>Comfortable coverage:</strong> The canopy should be wide enough to protect you without feeling bulky to carry.</li>
+                <li><strong>Style that matches you:</strong> Extra Store offers clean, bold colors so you can choose the look that fits your everyday style.</li>
+                <li><strong>Reliable materials:</strong> Durable fabric and quality finishing help keep your product looking good and working longer.</li>
+                <li><strong>Lightweight build:</strong> A lighter product is easier to carry every day and more convenient for travel.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 py-4 sm:px-6 lg:px-8">
+        <div class="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-line lg:grid-cols-2">
+          <div class="order-2 flex aspect-square w-full items-center bg-white px-6 py-8 sm:px-10 lg:order-1 lg:px-14">
+            <div class="space-y-4 w-full text-center text-black">
+              <h3 class="mx-auto max-w-3xl font-serif text-2xl leading-tight sm:text-3xl">
+                Everyday protection, made simple and stylish
+              </h3>
+              <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-6">
+                <li class="text-left"><strong>Weather-ready convenience:</strong> Pick items that help you move through rainy days without slowing down.</li>
+                <li class="text-left"><strong>Compact storage:</strong> Our products are designed to tuck away neatly when you’re not using them.</li>
+                <li class="text-left"><strong>Dependable build quality:</strong> Strong frame materials and careful finishing help products last longer.</li>
+                <li class="text-left"><strong>Comfortable coverage:</strong> Practical sizing helps keep you protected without feeling cumbersome.</li>
+                <li class="text-left"><strong>Clean color options:</strong> Bold red, classic black, blue, green, grey, and pink give you easy style choices.</li>
+                <li class="text-left"><strong>Travel friendly:</strong> Lightweight products are easier to carry every day or pack for trips.</li>
+                <li class="text-left"><strong>Designed for daily use:</strong> Extra Store products are built to be useful, attractive, and simple to live with.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="order-1 flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#f6ecd9] to-[#f0e4d0] p-0 lg:order-2">
+            <img src="assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg" alt="Umbrella product color variation" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto grid max-w-screen-2xl gap-8 rounded-[2rem] bg-[#f9f3ee] p-5 shadow-sm ring-1 ring-line lg:grid-cols-[1.1fr_0.9fr] lg:p-8">
+          <div class="space-y-4">
+            <div class="grid gap-3 sm:grid-cols-4">
+              <div class="overflow-hidden rounded-[1rem] border border-[#e7d8cc] bg-white p-2">
+                <img src="assets/red-product-clean.png" alt="Umbrella front view" class="h-24 w-full rounded-[0.7rem] object-cover sm:h-28 product-detail-trigger" data-product="umbrella-red">
+              </div>
+              <div class="overflow-hidden rounded-[1rem] border border-[#e7d8cc] bg-white p-2">
+                <img src="assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg" alt="Umbrella side view" class="h-24 w-full rounded-[0.7rem] object-cover sm:h-28 product-detail-trigger" data-product="umbrella-blue">
+              </div>
+              <div class="overflow-hidden rounded-[1rem] border border-[#e7d8cc] bg-white p-2">
+                <img src="assets/green.jpg" alt="Umbrella color view" class="h-24 w-full rounded-[0.7rem] object-cover sm:h-28 product-detail-trigger" data-product="umbrella-green">
+              </div>
+              <div class="overflow-hidden rounded-[1rem] border border-[#e7d8cc] bg-white p-2">
+                <img src="assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg" alt="Umbrella close view" class="h-24 w-full rounded-[0.7rem] object-cover sm:h-28 product-detail-trigger" data-product="umbrella-pink">
+              </div>
+            </div>
+            <div class="overflow-hidden rounded-[1.5rem] border border-[#e7d8cc] bg-white p-3">
+              <img src="assets/red-product-transparent-v4.png" alt="Main umbrella product" class="h-[340px] w-full rounded-[1rem] object-contain sm:h-[440px] product-detail-trigger" data-product="umbrella-red">
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center">
+            <div class="mb-3 inline-flex w-fit items-center rounded-full border border-[#d9b0a7] bg-[#fff5f3] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">
+              New Arrival
+            </div>
+            <h3 class="font-serif text-3xl leading-tight text-ink sm:text-4xl">
+              Charging Intelligence Electric Umbrella, Folding Anti-UV Umbrellas Rain For Windproof Parasol
+            </h3>
+            <div class="mt-4 flex items-center gap-3 text-[#7a1f2b]">
+              <span class="text-2xl font-bold">$39.99</span>
+              <span class="text-sm text-muted line-through">$54.99</span>
+            </div>
+            <p class="mt-4 text-sm leading-7 text-muted">
+              Smart, compact, and ready for everyday weather. This windproof electric umbrella gives you instant protection from rain and harsh UV rays, with auto-open/close convenience and a sleek foldable design.
+            </p>
+
+            <div class="mt-6">
+              <div class="mb-2 text-sm font-semibold text-ink">Available Colors</div>
+              <div class="flex flex-wrap gap-3">
+                <span class="h-8 w-8 rounded-full border-2 border-[#7a1f2b] bg-[#d7c4b1] shadow-sm" title="Wutong Beige"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#111111] shadow-sm" title="Black"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#2f4f82] shadow-sm" title="Blue"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#688d66] shadow-sm" title="Green"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#a8a6a2] shadow-sm" title="Grey"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#f2c7d6] shadow-sm" title="Pink"></span>
+                <span class="h-8 w-8 rounded-full border border-[#d9d9d9] bg-[#9ec9ee] shadow-sm" title="Sky Blue"></span>
+              </div>
+            </div>
+
+            <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+              <button class="inline-flex items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+                Add to Cart
+              </button>
+              <button class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#5c141e]">
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product detail modal (hidden) -->
+      <div class="detail-modal" id="productModal" aria-hidden="true">
+        <div class="detail-modal-panel p-6 lg:p-8">
+          <button class="detail-close" id="detailClose">×</button>
+          <div class="grid gap-6 lg:grid-cols-2">
+            <div>
+              <img id="detailMain" class="detail-main-image" src="assets/red-product-transparent-v4.png" alt="Product">
+              <div class="detail-gallery mt-4" id="detailThumbs" role="list">
+              </div>
+            </div>
+            <div>
+              <div class="mb-3 inline-flex items-center rounded-full bg-[#fff5f3] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#7a1f2b]">Product</div>
+              <h3 id="detailTitle" class="font-serif text-2xl text-ink mb-2">Charging Intelligence Electric Umbrella</h3>
+              <div id="detailPrice" class="text-2xl font-bold text-[#7a1f2b]">$39.99</div>
+              <p id="detailDesc" class="mt-4 text-sm text-muted">Full description goes here.</p>
+
+              <div class="mt-6">
+                <div class="flex items-center gap-3">
+                  <div class="qty-box" id="qtyBox">
+                    <button class="qty-btn" id="qtyDec">−</button>
+                    <div class="qty-value" id="qtyValue">1</div>
+                    <button class="qty-btn" id="qtyInc">＋</button>
+                  </div>
+                  <button id="detailAdd" class="inline-flex items-center justify-center rounded-full border-2 border-[#7a1f2b] bg-white px-6 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">Add to Cart</button>
+                  <button id="detailRemove" class="inline-flex items-center justify-center rounded-full border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hidden">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="w-full px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+        <div class="mx-auto max-w-screen-2xl text-center">
+          <h2 class="font-serif text-3xl text-ink sm:text-4xl">What customers say about Extra Store</h2>
+          <div class="mt-10 grid gap-6 lg:grid-cols-3">
+            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
+              <div class="mb-3 text-sm text-gold">★★★★★</div>
+              <p class="text-sm leading-6 text-muted">The umbrella feels sturdy, folds neatly, and the red finish looks even better in person.</p>
+              <div class="mt-5 flex items-center gap-3">
+                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
+              <span class="text-sm font-semibold text-ink">Jane F.</span>
+              </div>
+            </article>
+            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
+              <div class="mb-3 text-sm text-gold">★★★★★</div>
+              <p class="text-sm leading-6 text-muted">Shipping was fast, the packaging looked great, and the product quality matched the photos perfectly.</p>
+              <div class="mt-5 flex items-center gap-3">
+                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
+              <span class="text-sm font-semibold text-ink">Helen S.</span>
+              </div>
+            </article>
+            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
+              <div class="mb-3 text-sm text-gold">★★★★★</div>
+              <p class="text-sm leading-6 text-muted">This is exactly the kind of everyday item I want from a store like this, practical, clean, and reliable.</p>
+              <div class="mt-5 flex items-center gap-3">
+                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
+              <span class="text-sm font-semibold text-ink">Amara L.</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20">
+        <div class="mx-auto flex max-w-screen-2xl flex-col gap-5 rounded-[1.6rem] bg-gradient-to-r from-[#7a1f2b] to-[#5c141e] px-6 py-8 text-white sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:py-10">
+          <h3 class="font-serif text-2xl sm:text-3xl">Stay in the Loop</h3>
+          <form class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <input class="w-full rounded-full bg-white px-5 py-3 text-sm text-ink outline-none placeholder:text-muted sm:w-80" type="email" placeholder="Enter your email">
+            <button class="rounded-full bg-ink px-6 py-3 text-sm font-medium text-white transition hover:bg-black/80" type="button">Join</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="w-full bg-[#4a0e17] text-[#f6ecd9]">
+      <div class="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="grid gap-8 lg:grid-cols-[1.4fr_1fr_1fr]">
+          <div>
+            <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-3 h-8 w-auto object-contain">
+            <p class="mb-2 text-sm text-[#d9c49a]">Everyday essentials, smart finds, and practical products for life on the move.</p>
+            <p class="text-sm text-[#d9c49a]">hello@extrastore.com</p>
+          </div>
+          <div>
+            <h4 class="mb-3 text-sm font-semibold text-white">Menu</h4>
+            <ul class="space-y-2 text-sm text-[#d9c49a]">
+              <li>Shop</li>
+              <li>About</li>
+              <li>Blog</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="mb-3 text-sm font-semibold text-white">Company</h4>
+            <ul class="space-y-2 text-sm text-[#d9c49a]">
+              <li>Privacy</li>
+              <li>Terms &amp; Conditions</li>
+              <li>Contact</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76]">
+          © 2026 Extra Store. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div id="productDetailModal" class="detail-modal" aria-hidden="true">
+    <div class="detail-modal-panel">
+      <button type="button" class="detail-close" aria-label="Close product details">×</button>
+      <div class="grid gap-0 lg:grid-cols-2">
+        <div class="bg-[#f8f1eb] p-4 sm:p-6">
+          <img id="detailMainImage" class="detail-main-image" src="assets/red-product-clean.png" alt="Product image">
+          <div id="detailGallery" class="detail-gallery">
+            <div class="detail-thumb active"><img src="assets/red-product-clean.png" alt="Product thumbnail 1"></div>
+            <div class="detail-thumb"><img src="assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg" alt="Product thumbnail 2"></div>
+            <div class="detail-thumb"><img src="assets/green.jpg" alt="Product thumbnail 3"></div>
+            <div class="detail-thumb"><img src="assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg" alt="Product thumbnail 4"></div>
+            <div class="detail-thumb"><img src="assets/red-product-transparent-v4.png" alt="Product thumbnail 5"></div>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-7 lg:p-8">
+          <div class="mb-3 inline-flex items-center rounded-full border border-[#e8c8c8] bg-[#fff2f2] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">
+            Best Seller
+          </div>
+          <h2 id="detailTitle" class="font-serif text-3xl leading-tight text-ink sm:text-4xl">Charging Intelligence Electric Umbrella</h2>
+          <div class="mt-4 flex items-center gap-3 text-[#7a1f2b]">
+            <span id="detailPrice" class="text-2xl font-bold">$18.14</span>
+            <span class="text-sm text-muted line-through">$29.99</span>
+          </div>
+          <div class="mt-4 text-black text-center">
+            <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-7 text-left">
+              <li><strong>Fully-automatic operation with intelligent charging:</strong> This automatic anti-rebound umbrella features a fully-automatic control system with intelligent charging, offering effortless opening and closing with just a button press. Ideal for quick protection in sudden rain or sun.</li>
+              <li><strong>Compact 3-folding design for easy portability:</strong> The three-folding umbrella collapses into a compact size of 10 x 10 x 10 cm, making it easy to carry in bags or backpacks. Perfect for daily commutes or travel without adding bulk.</li>
+              <li><strong>Windproof and UV-protective with durable frame:</strong> Built with a metal-fiber composite frame and 8K frame structure, this umbrella resists wind and rebound. The 190T PONGEE protection layer ensures strong UV and rain resistance for reliable outdoor use.</li>
+              <li><strong>Large 55–61cm radius for full coverage:</strong> With a wide 55–61cm radius, this umbrella provides ample coverage for adults. The spacious design keeps you dry and shaded in both sunny and rainy conditions.</li>
+              <li><strong>Available in multiple stylish colors:</strong> Choose from a variety of colors: Wutong Beige, Black, Blue, Green, Grey, Pink, Sky Blue. Each color offers a unique look, allowing you to match your style while staying protected.</li>
+              <li><strong>High-quality nylon material with no harmful chemicals:</strong> Made from nylon fabric with no high-concerned chemicals, this umbrella ensures safety and durability. The material is lightweight yet strong, designed for long-term use in all weather.</li>
+              <li><strong>Lightweight and sold as one piece per pack:</strong> Weighing only 0.600 kg, this umbrella is ultra-light and easy to carry. Sold as 1 piece per pack, it’s perfect for individual users seeking a reliable, all-in-one rain and sun solution.</li>
+            </ul>
+          </div>
+
+          <div class="mt-6">
+            <div class="mb-2 text-sm font-semibold text-ink">Color</div>
+            <div id="detailColor" class="inline-flex items-center rounded-full border border-[#e8d6d2] bg-[#fdf0ef] px-3 py-1 text-sm font-medium text-[#7a1f2b]">Red</div>
+          </div>
+
+          <div class="mt-6">
+            <div class="mb-2 text-sm font-semibold text-ink">Quantity</div>
+            <div class="qty-box">
+              <button type="button" class="qty-btn" data-qty-action="decrease">−</button>
+              <span id="detailQty" class="qty-value">1</span>
+              <button type="button" class="qty-btn" data-qty-action="increase">+</button>
+            </div>
+          </div>
+
+          <div class="mt-8 space-y-3">
+            <button id="addToCartBtn" type="button" class="w-full rounded-full border-2 border-[#7a1f2b] bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
+              Add to Cart
+            </button>
+            <div id="cartActions" class="hidden flex gap-3">
+              <button id="removeFromCartBtn" type="button" class="flex-1 rounded-full border border-[#7a1f2b] bg-[#fff2f2] px-6 py-3 text-sm font-semibold text-[#7a1f2b]">
+                Remove from Cart
+              </button>
+              <button id="keepShoppingBtn" type="button" class="flex-1 rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold text-white">
+                Keep Shopping
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-8 rounded-[1rem] border border-[#f0d8d4] bg-[#fff8f7] p-4">
+            <div class="mb-2 text-sm font-semibold text-[#7a1f2b]">Why shoppers love it</div>
+            <ul class="space-y-2 text-sm leading-6 text-[#7a1f2b]/90">
+              <li>• Fully automatic open/close for everyday convenience</li>
+              <li>• Windproof, lightweight, and compact for travel</li>
+              <li>• UV protection and durable rain-ready fabric</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('productDetailModal');
+    const detailMainImage = document.getElementById('detailMainImage');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailPrice = document.getElementById('detailPrice');
+    const detailColor = document.getElementById('detailColor');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const cartActions = document.getElementById('cartActions');
+    const removeFromCartBtn = document.getElementById('removeFromCartBtn');
+    const keepShoppingBtn = document.getElementById('keepShoppingBtn');
+    const detailQty = document.getElementById('detailQty');
+    const closeBtn = document.querySelector('.detail-close');
+
+    let currentQty = 1;
+
+    function openProductDetails(img) {
+      const name = img.dataset.productName || 'Charging Intelligence Electric Umbrella';
+      const price = img.dataset.productPrice || '$18.14';
+      const color = img.dataset.productColor || 'Red';
+      const image = img.dataset.productImage || img.src;
+
+      detailTitle.textContent = name;
+      detailPrice.textContent = price;
+      detailColor.textContent = color;
+      detailMainImage.src = image;
+      currentQty = 1;
+      detailQty.textContent = String(currentQty);
+      addToCartBtn.textContent = 'Add to Cart';
+      cartActions.classList.add('hidden');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeProductDetails() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.querySelectorAll('.product-detail-trigger').forEach((img) => {
+      img.addEventListener('click', () => openProductDetails(img));
+    });
+
+    closeBtn.addEventListener('click', closeProductDetails);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeProductDetails();
+    });
+
+    document.querySelectorAll('[data-qty-action]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const action = button.dataset.qtyAction;
+        currentQty = action === 'increase' ? currentQty + 1 : Math.max(1, currentQty - 1);
+        detailQty.textContent = String(currentQty);
+      });
+    });
+
+    addToCartBtn.addEventListener('click', () => {
+      addToCartBtn.textContent = 'Added to Cart';
+      cartActions.classList.remove('hidden');
+    });
+
+    removeFromCartBtn.addEventListener('click', () => {
+      addToCartBtn.textContent = 'Add to Cart';
+      cartActions.classList.add('hidden');
+      currentQty = 1;
+      detailQty.textContent = '1';
+    });
+
+    keepShoppingBtn.addEventListener('click', closeProductDetails);
+
+    document.querySelectorAll('.detail-thumb').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        document.querySelectorAll('.detail-thumb').forEach((item) => item.classList.remove('active'));
+        thumb.classList.add('active');
+        const img = thumb.querySelector('img');
+        detailMainImage.src = img.src;
+      });
+    });
+  </script>
+  <script src="assets/js/hero-scroll-frames.js" defer></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
