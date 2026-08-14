@@ -107,7 +107,7 @@
   }
 
   function formatMoney(amount) {
-    return `$${Number(amount || 0).toFixed(2)}`;
+    return `₦${Number(amount || 0).toFixed(2)}`;
   }
 
   function setItemQty(id, qty) {

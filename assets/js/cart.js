@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       node.textContent = store.formatMoney(subtotal);
     });
     shippingEl.forEach((node) => {
-      node.textContent = items.length ? store.formatMoney(shipping) : '$0.00';
+      node.textContent = items.length ? store.formatMoney(shipping) : store.formatMoney(0);
     });
     totalEl.forEach((node) => {
       node.textContent = store.formatMoney(total);
