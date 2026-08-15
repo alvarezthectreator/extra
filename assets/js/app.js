@@ -109,6 +109,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function syncCardSlider(root, nextIndex) {
+    if (!root) return;
+
+    const track = root.querySelector('[data-card-slider-track]');
+    const slides = Array.from(root.querySelectorAll('[data-card-slider-slide]'));
+    const dots = Array.from(root.querySelectorAll('[data-card-slider-dot]'));
+
+    if (!track || !slides.length) return;
+
+    const total = slides.length;
+    const activeIndex = ((Number(nextIndex) || 0) % total + total) % total;
+
+    root.dataset.activeSlide = String(activeIndex);
+    track.style.transform = `translateX(-${activeIndex * 100}%)`;
+
+    dots.forEach((dot, index) => {
+      const isActive = index === activeIndex;
+      dot.classList.toggle('active', isActive);
+      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  }
+
+  function initCardSliders() {
+    document.querySelectorAll('[data-card-slider]').forEach((root) => {
+      syncCardSlider(root, Number(root.dataset.activeSlide || 0));
+    });
+  }
+
+  function initReadMoreBlocks() {
+    document.querySelectorAll('[data-read-more-toggle]').forEach((button) => {
+      const section = button.closest('div');
+      const list = section?.querySelector('[data-read-more-list]');
+      const items = list ? Array.from(list.querySelectorAll('[data-read-more-item]')) : [];
+      const label = button.querySelector('[data-read-more-label]');
+      let expanded = false;
+
+      if (!items.length) return;
+
+      function sync() {
+        items.forEach((item) => {
+          item.classList.toggle('hidden', !expanded);
+        });
+        if (label) {
+          label.textContent = expanded ? 'Read less' : 'Read more';
+        }
+        button.lastElementChild.textContent = expanded ? '−' : '+';
+      }
+
+      button.addEventListener('click', () => {
+        expanded = !expanded;
+        sync();
+      });
+
+      sync();
+    });
+  }
+
   function openModal(productId, trigger = null) {
     const product = store.getProduct(productId);
     if (!product || !modal) return;
@@ -120,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasItemsInCart = store.getCartCount() > 0;
 
     detailTitle.textContent = product.name;
-    // Show Naira price label for product modal
-    detailPrice.textContent = '₦24,000 naira';
+    detailPrice.textContent = store.formatMoney(product.price);
     detailDesc.textContent = product.description;
     detailQty.textContent = String(activeQty);
     detailAdd.textContent = existingEntry ? 'In Cart' : 'Add to Cart';
@@ -397,6 +454,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  document.addEventListener('click', (event) => {
+    const control = event.target.closest('[data-card-slider-prev], [data-card-slider-next], [data-card-slider-dot]');
+    if (!control) return;
+
+    const root = control.closest('[data-card-slider]');
+    if (!root) return;
+
+    event.preventDefault();
+
+    const currentIndex = Number(root.dataset.activeSlide || 0);
+    if (control.hasAttribute('data-card-slider-prev')) {
+      syncCardSlider(root, currentIndex - 1);
+    } else if (control.hasAttribute('data-card-slider-next')) {
+      syncCardSlider(root, currentIndex + 1);
+    } else if (control.hasAttribute('data-card-slider-dot')) {
+      syncCardSlider(root, Number(control.dataset.slideTo || 0));
+    }
+  });
+
   if (cartToggleButtons.length) {
     cartToggleButtons.forEach((button) => {
       button.addEventListener('click', () => openDrawer(button));
@@ -463,6 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   store.updateCartBadges();
+  initCardSliders();
+  initReadMoreBlocks();
   renderDrawer();
   syncModalState();
   applyCatalogFilters();

@@ -106,7 +106,11 @@
   }
 
   function formatMoney(amount) {
-    return `₦${Number(amount || 0).toFixed(2)}`;
+    const value = Number(amount || 0);
+    return `₦${value.toLocaleString('en-NG', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    })}`;
   }
 
   function setItemQty(id, qty) {

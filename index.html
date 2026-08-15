@@ -412,6 +412,11 @@
               <h2 class="mt-2 font-serif text-3xl text-ink sm:text-4xl">Best Sellers at Extra Store</h2>
               <p class="mt-3 text-sm leading-6 text-muted">Search, filter, and sort to find the exact umbrella you want.</p>
             </div>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-terracottaDark">
+              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">Swipe cards</span>
+              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">Tap add to cart</span>
+              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">View details</span>
+            </div>
             <div class="grid gap-3 sm:grid-cols-3 lg:w-[42rem]">
               <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
                 <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Search</span>
@@ -444,43 +449,148 @@
             </button>
           </div>
           <div id="productGrid" class="mt-8 grid gap-6 lg:grid-cols-3">
-            <article data-product-card data-product-name="Classic Red Auto Umbrella" data-product-category="Travel Essential" data-product-color="Red" data-product-price="18.14" data-product-tags="red compact travel umbrella" data-sort-order="1" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
-              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/pink.jpg" alt="Red umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-red" data-product-image="assets/pink.jpg" data-product-name="Classic Red Auto Umbrella" data-product-price="$18.14" data-product-color="Red">
+            <article data-product-card data-product-name="Classic Red Auto Umbrella" data-product-category="Travel Essential" data-product-color="Red" data-product-price="24000" data-product-tags="red compact travel umbrella" data-sort-order="1" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
+              <div class="best-seller-media">
+                <div class="best-seller-slider" data-card-slider data-active-slide="0">
+                  <div class="best-seller-track" data-card-slider-track>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/1.jpeg" alt="Classic Red Auto Umbrella, image 1" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/2.jpeg" alt="Classic Red Auto Umbrella, image 2" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/3.jpeg" alt="Classic Red Auto Umbrella, image 3" class="best-seller-image">
+                    </div>
+                  </div>
+                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
+                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
+                </div>
+                <div class="best-seller-badge">Best Seller</div>
               </div>
-              <div class="p-5">
-                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
-                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Classic Red Auto Umbrella</h3>
-                <div class="mt-2 text-base font-semibold text-ink">$18.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button type="button" data-add-to-cart data-product-id="umbrella-red" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
-                  Add to Cart
-                </button>
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
+                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
+                </div>
+                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Classic Red Auto Umbrella</h3>
+                <p class="mt-2 text-sm leading-6 text-muted">Compact, wind-ready, and polished for everyday carry.</p>
+                <div class="mt-4 flex items-end justify-between gap-3">
+                  <div>
+                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
+                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
+                  </div>
+                  <div class="text-sm text-muted">1 piece</div>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                  <button type="button" data-add-to-cart data-product-id="umbrella-red" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">
+                    Add to Cart
+                  </button>
+                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-white px-4 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#fff7f5]" data-product="umbrella-red">
+                    View Details
+                  </button>
+                </div>
+                <div class="best-seller-dots" data-card-slider-dots>
+                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
+                </div>
               </div>
             </article>
-            <article data-product-card data-product-name="Green Windproof Umbrella" data-product-category="Travel Essential" data-product-color="Green" data-product-price="23.19" data-product-tags="green windproof umbrella" data-sort-order="2" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
-              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/red.jpg" alt="Green umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-green" data-product-image="assets/red.jpg" data-product-name="Green Windproof Umbrella" data-product-price="$23.19" data-product-color="Green">
+            <article data-product-card data-product-name="Green Windproof Umbrella" data-product-category="Travel Essential" data-product-color="Green" data-product-price="24000" data-product-tags="green windproof umbrella" data-sort-order="2" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
+              <div class="best-seller-media">
+                <div class="best-seller-slider" data-card-slider data-active-slide="0">
+                  <div class="best-seller-track" data-card-slider-track>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/2.jpeg" alt="Green Windproof Umbrella, image 1" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/2.jpeg" alt="Green Windproof Umbrella, image 2" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/3.jpeg" alt="Green Windproof Umbrella, image 3" class="best-seller-image">
+                    </div>
+                  </div>
+                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
+                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
+                </div>
+                <div class="best-seller-badge">Best Seller</div>
               </div>
-              <div class="p-5">
-                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
-                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Green Windproof Umbrella</h3>
-                <div class="mt-2 text-base font-semibold text-ink">$23.19 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button type="button" data-add-to-cart data-product-id="umbrella-green" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
-                  Add to Cart
-                </button>
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
+                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
+                </div>
+                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Green Windproof Umbrella</h3>
+                <p class="mt-2 text-sm leading-6 text-muted">A clean, lightweight profile made for unpredictable weather.</p>
+                <div class="mt-4 flex items-end justify-between gap-3">
+                  <div>
+                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
+                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
+                  </div>
+                  <div class="text-sm text-muted">1 piece</div>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                  <button type="button" data-add-to-cart data-product-id="umbrella-green" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">
+                    Add to Cart
+                  </button>
+                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-white px-4 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#fff7f5]" data-product="umbrella-green">
+                    View Details
+                  </button>
+                </div>
+                <div class="best-seller-dots" data-card-slider-dots>
+                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
+                </div>
               </div>
             </article>
-            <article data-product-card data-product-name="Blue Compact Auto Umbrella" data-product-category="Travel Essential" data-product-color="Blue" data-product-price="27.14" data-product-tags="blue compact auto umbrella" data-sort-order="3" class="catalog-card fade-in-up overflow-hidden rounded-[1.2rem] border border-line bg-white">
-              <div class="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-[#f4efe8] to-[#d9d7cf] p-3">
-                <img src="assets/blue.jpg" alt="Blue umbrella" class="product-detail-trigger h-full w-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.18)]" data-product="umbrella-blue" data-product-image="assets/blue.jpg" data-product-name="Blue Compact Auto Umbrella" data-product-price="$27.14" data-product-color="Blue">
+            <article data-product-card data-product-name="Blue Compact Auto Umbrella" data-product-category="Travel Essential" data-product-color="Blue" data-product-price="24000" data-product-tags="blue compact auto umbrella" data-sort-order="3" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
+              <div class="best-seller-media">
+                <div class="best-seller-slider" data-card-slider data-active-slide="0">
+                  <div class="best-seller-track" data-card-slider-track>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/3.jpeg" alt="Blue Compact Auto Umbrella, image 1" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/2.jpeg" alt="Blue Compact Auto Umbrella, image 2" class="best-seller-image">
+                    </div>
+                    <div class="best-seller-slide" data-card-slider-slide>
+                      <img src="assets/3.jpeg" alt="Blue Compact Auto Umbrella, image 3" class="best-seller-image">
+                    </div>
+                  </div>
+                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
+                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
+                </div>
+                <div class="best-seller-badge">Best Seller</div>
               </div>
-              <div class="p-5">
-                <div class="text-[0.7rem] uppercase tracking-[0.06em] text-terracottaDark">Travel Essential</div>
-                <h3 class="mt-2 text-[0.95rem] font-medium text-ink">Blue Compact Auto Umbrella</h3>
-                <div class="mt-2 text-base font-semibold text-ink">$27.14 <span class="text-xs font-normal text-muted">1 piece</span></div>
-                <button type="button" data-add-to-cart data-product-id="umbrella-blue" class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#7a1f2b] bg-white px-4 py-2 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#7a1f2b] hover:text-white">
-                  Add to Cart
-                </button>
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
+                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
+                </div>
+                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Blue Compact Auto Umbrella</h3>
+                <p class="mt-2 text-sm leading-6 text-muted">A sleek compact shape with a polished finish and easy carry.</p>
+                <div class="mt-4 flex items-end justify-between gap-3">
+                  <div>
+                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
+                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
+                  </div>
+                  <div class="text-sm text-muted">1 piece</div>
+                </div>
+                <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                  <button type="button" data-add-to-cart data-product-id="umbrella-blue" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">
+                    Add to Cart
+                  </button>
+                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-white px-4 py-3 text-sm font-semibold text-[#7a1f2b] transition hover:bg-[#fff7f5]" data-product="umbrella-blue">
+                    View Details
+                  </button>
+                </div>
+                <div class="best-seller-dots" data-card-slider-dots>
+                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
+                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
+                </div>
               </div>
             </article>
           </div>
@@ -495,20 +605,27 @@
           <div class="flex aspect-square w-full items-center justify-center overflow-hidden bg-[#f4efe8] p-0">
             <img src="assets/green.jpg" alt="Umbrella product view" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
           </div>
-          <div class="flex aspect-square w-full items-center bg-white px-6 py-8 text-[#7a1f2b] sm:px-10 lg:px-14">
-            <div class="space-y-4">
-              <h3 class="max-w-md font-serif text-2xl leading-tight text-[#7a1f2b] sm:text-3xl">
+          <div class="flex aspect-square w-full items-center bg-white px-6 py-8 text-black sm:px-10 lg:px-14">
+            <div class="space-y-4 text-black">
+              <h3 class="max-w-md font-serif text-2xl leading-tight text-black sm:text-3xl">
                 5 things to look for before you buy a folding umbrella
               </h3>
-              <ul class="space-y-3 text-sm leading-6 text-[#7a1f2b]">
+              <p class="max-w-md text-sm leading-6 text-black/80">
+                A quick checklist to help you choose a folding umbrella that actually feels good to use every day.
+              </p>
+              <ul class="space-y-3 text-sm leading-6 text-black" data-read-more-list>
                 <li><strong>Easy one-button open and close:</strong> Choose products that feel simple and reliable in daily use, especially when weather changes fast.</li>
                 <li><strong>Compact folding shape:</strong> A good umbrella should fit easily in your bag, backpack, or car without taking up space.</li>
                 <li><strong>Wind-resistant frame:</strong> Look for a durable structure that stays dependable during sudden gusts and heavy rain.</li>
-                <li><strong>Comfortable coverage:</strong> The canopy should be wide enough to protect you without feeling bulky to carry.</li>
-                <li><strong>Style that matches you:</strong> Extra Store offers clean, bold colors so you can choose the look that fits your everyday style.</li>
-                <li><strong>Reliable materials:</strong> Durable fabric and quality finishing help keep your product looking good and working longer.</li>
-                <li><strong>Lightweight build:</strong> A lighter product is easier to carry every day and more convenient for travel.</li>
+                <li class="hidden" data-read-more-item><strong>Comfortable coverage:</strong> The canopy should be wide enough to protect you without feeling bulky to carry.</li>
+                <li class="hidden" data-read-more-item><strong>Style that matches you:</strong> Extra Store offers clean, bold colors so you can choose the look that fits your everyday style.</li>
+                <li class="hidden" data-read-more-item><strong>Reliable materials:</strong> Durable fabric and quality finishing help keep your product looking good and working longer.</li>
+                <li class="hidden" data-read-more-item><strong>Lightweight build:</strong> A lighter product is easier to carry every day and more convenient for travel.</li>
               </ul>
+              <button type="button" data-read-more-toggle class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#1d1d1d]">
+                <span data-read-more-label>Read more</span>
+                <span aria-hidden="true">+</span>
+              </button>
             </div>
           </div>
         </div>
@@ -518,18 +635,25 @@
         <div class="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-line lg:grid-cols-2">
           <div class="order-2 flex aspect-square w-full items-center bg-white px-6 py-8 sm:px-10 lg:order-1 lg:px-14">
             <div class="space-y-4 w-full text-center text-black">
-              <h3 class="mx-auto max-w-3xl font-serif text-2xl leading-tight sm:text-3xl">
+              <h3 class="mx-auto max-w-3xl font-serif text-2xl leading-tight text-black sm:text-3xl">
                 Everyday protection, made simple and stylish
               </h3>
-              <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-6">
+              <p class="mx-auto max-w-3xl text-sm leading-6 text-black/80">
+                A quick checklist to help you choose a folding umbrella that feels practical, durable, and easy to carry.
+              </p>
+              <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-6 text-black" data-read-more-list>
                 <li class="text-left"><strong>Weather-ready convenience:</strong> Pick items that help you move through rainy days without slowing down.</li>
                 <li class="text-left"><strong>Compact storage:</strong> Our products are designed to tuck away neatly when you’re not using them.</li>
                 <li class="text-left"><strong>Dependable build quality:</strong> Strong frame materials and careful finishing help products last longer.</li>
-                <li class="text-left"><strong>Comfortable coverage:</strong> Practical sizing helps keep you protected without feeling cumbersome.</li>
-                <li class="text-left"><strong>Clean color options:</strong> Bold red, classic black, blue, green, grey, and pink give you easy style choices.</li>
-                <li class="text-left"><strong>Travel friendly:</strong> Lightweight products are easier to carry every day or pack for trips.</li>
-                <li class="text-left"><strong>Designed for daily use:</strong> Extra Store products are built to be useful, attractive, and simple to live with.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Comfortable coverage:</strong> Practical sizing helps keep you protected without feeling cumbersome.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Clean color options:</strong> Bold red, classic black, blue, green, grey, and pink give you easy style choices.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Travel friendly:</strong> Lightweight products are easier to carry every day or pack for trips.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Designed for daily use:</strong> Extra Store products are built to be useful, attractive, and simple to live with.</li>
               </ul>
+              <button type="button" data-read-more-toggle class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#1d1d1d]">
+                <span data-read-more-label>Read more</span>
+                <span aria-hidden="true">+</span>
+              </button>
             </div>
           </div>
           <div class="order-1 flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#f6ecd9] to-[#f0e4d0] p-0 lg:order-2">
