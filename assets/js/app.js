@@ -465,4 +465,70 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDrawer();
   syncModalState();
   applyCatalogFilters();
+  // Hero entrance animations — run after other app initialization
+  (function(){
+    try {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      var left = document.querySelector('[data-hero-line="left"]');
+      var right = document.querySelector('[data-hero-line="right"]');
+      var support = document.querySelector('[data-hero-support]');
+      if (left || right) {
+        if (left) left.classList.add('animate-slide-in-left');
+        if (right) setTimeout(function(){ right.classList.add('animate-slide-in-right'); }, 120);
+        if (support) setTimeout(function(){ support.classList.add('animate-fade-up'); }, 420);
+      } else {
+        var h1 = document.querySelector('main h1');
+        var p = h1 ? h1.nextElementSibling : null;
+        if (h1) h1.classList.add('animate-slide-in-right');
+        if (p) setTimeout(function(){ p.classList.add('animate-slide-in-left'); }, 120);
+        if (p && p.nextElementSibling) setTimeout(function(){ p.nextElementSibling.classList.add('animate-fade-up'); }, 420);
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  })();
+  // Animate hero image and CTAs with a float-in
+  (function(){
+    try {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+      var img = document.querySelector('[data-hero-image]') || document.querySelector('main img[alt="Featured product"]') || document.querySelector('.relative.z-10 img');
+      var buttons = Array.from(document.querySelectorAll('[data-hero-button]'));
+      if (!buttons.length) {
+        var b1 = document.querySelector('a[href="#featured-products"]');
+        var b2 = document.querySelector('a[href="#new-arrivals"]');
+        [b1, b2].forEach(function(b){ if (b) buttons.push(b); });
+      }
+      // final fallback: any prominent hero buttons inside the hero area
+      if (!buttons.length) {
+        var hero = document.querySelector('main') || document.body;
+        buttons = Array.from(hero.querySelectorAll('a')).filter(a => a.classList.contains('inline-flex') || a.classList.contains('btn') || /explore|browse|shop/i.test(a.textContent));
+      }
+      if (img) {
+        // apply a much slower float-in for the main hero image
+        setTimeout(function(){ img.classList.add('animate-float-in-slow'); }, 700);
+      }
+      buttons.forEach(function(btn, i){
+        setTimeout(function(){ btn.classList.add('animate-float-in'); }, 900 + (i * 160));
+      });
+    } catch (e) { /* ignore */ }
+  })();
+  // Find and animate the specific paragraph text (bottom-up)
+  (function(){
+    try {
+      var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+      var targets = Array.from(document.querySelectorAll('p'));
+      var found = targets.find(function(el){
+        var txt = (el.textContent || '').replace(/\s+/g,' ').trim();
+        return txt.indexOf('Convenience, comfort') !== -1 || txt.indexOf('Extra Store keeps everyday') !== -1;
+      });
+      if (found) {
+        // small delay so it appears after hero
+        setTimeout(function(){ found.classList.add('animate-slide-in-up'); }, 600);
+      }
+    } catch (e) { /* ignore */ }
+  })();
 });

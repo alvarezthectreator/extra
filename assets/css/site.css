@@ -146,8 +146,50 @@
   .popup-panel,
   .fade-in-up,
   .slide-in-right,
-  .scale-in {
+  .scale-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-fade-up {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Hero entrance animations (added) */
+.hero-line { will-change: transform, opacity; }
+@keyframes slideInFromLeft {
+  from { transform: translateX(-110vw); opacity: 0; }
+  to { transform: translateX(0px); opacity: 1; }
+}
+@keyframes slideInFromRight {
+  from { transform: translateX(110vw); opacity: 0; }
+  to { transform: translateX(0px); opacity: 1; }
+}
+@keyframes fadeUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-in-left { animation: slideInFromLeft 2200ms cubic-bezier(.2,.9,.3,1) both; }
+.animate-slide-in-right { animation: slideInFromRight 2200ms cubic-bezier(.2,.9,.3,1) both; }
+.animate-fade-up { animation: fadeUp 1800ms cubic-bezier(.2,.9,.3,1) both; }
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(110vh); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-in-up { animation: slideInFromBottom 1800ms cubic-bezier(.2,.9,.3,1) both; }
+
+@keyframes floatIn {
+  from { transform: translateY(36px) scale(.99); opacity: 0; }
+  60% { transform: translateY(6px) scale(1.01); opacity: 1; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+.animate-float-in { animation: floatIn 1400ms cubic-bezier(.2,.9,.3,1) both; }
+/* Slower variant for large hero image entrance */
+.animate-float-in-slow { animation: floatIn 5000ms cubic-bezier(.2,.9,.3,1) both; }
+
+/* Ensure hero CTA buttons remain visible on small screens */
+[data-hero-button], main a.inline-flex {
+  display: inline-flex !important;
+  visibility: visible !important;
 }
