@@ -37,163 +37,211 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 }
 
 $autoload = __DIR__ . '/vendor/autoload.php';
-if (!file_exists($autoload)) {
-    fail('PHPMailer is not installed yet. Run composer install before sending orders.', 500, $wantsJson);
+if (file_exists($autoload)) {
+    require $autoload;
 }
-
-require $autoload;
-
-$products = [
-    'umbrella-red' => [
-        'name' => 'Classic Red Auto Umbrella',
-        'price' => 24000,
-        'category' => 'Travel Essential'
-    ],
-    'umbrella-green' => [
-        'name' => 'Green Windproof Umbrella',
-        'price' => 24000,
-        'category' => 'Travel Essential'
-    ],
-    'umbrella-blue' => [
-        'name' => 'Blue Compact Auto Umbrella',
-        'price' => 24000,
-        'category' => 'Travel Essential'
-    ],
-    'umbrella-pink' => [
-        'name' => 'Pink Compact Umbrella',
-        'price' => 24000,
-        'category' => 'Travel Essential'
-    ]
-];
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/product-repository.php';
 
 $productId = trim((string) ($_POST['product'] ?? ''));
 $qty = (int) ($_POST['qty'] ?? 1);
 $qty = max(1, min(99, $qty));
-
-if (!isset($products[$productId])) {
-    fail('Please choose a valid product.', 422, $wantsJson);
-}
-
-$product = $products[$productId];
-$productName = trim((string) ($_POST['product_name'] ?? $product['name']));
-$productPrice = (int) ($_POST['product_price'] ?? $product['price']);
-$productTotal = (int) ($_POST['product_total'] ?? ($productPrice * $qty));
-$productCategory = trim((string) ($_POST['product_category'] ?? $product['category']));
-$firstName = trim((string) ($_POST['first_name'] ?? ''));
-$lastName = trim((string) ($_POST['last_name'] ?? ''));
-$customerName = trim((string) ($_POST['customer_name'] ?? trim($firstName . ' ' . $lastName)));
-$email = trim((string) ($_POST['email'] ?? ''));
+$fullName = trim((string) ($_POST['full_name'] ?? ($_POST['customer_name'] ?? '')));
 $address = trim((string) ($_POST['address'] ?? ''));
-$city = trim((string) ($_POST['city'] ?? ''));
 $state = trim((string) ($_POST['state'] ?? ''));
 $orderNote = trim((string) ($_POST['order_note'] ?? ''));
 $orderNumber = preg_replace('/\D+/', '', (string) ($_POST['order_number'] ?? ''));
 $orderNumber = $orderNumber !== '' ? $orderNumber : (string) random_int(100000, 999999);
 
-if ($firstName === '' || $lastName === '' || $email === '' || $address === '' || $city === '' || $state === '') {
+if ($fullName === '' || $address === '' || $state === '') {
     fail('Please complete all required fields.', 422, $wantsJson);
 }
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    fail('Please enter a valid email address.', 422, $wantsJson);
+$nameParts = preg_split('/\s+/', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+$firstName = $nameParts[0] ?? '';
+$lastName = count($nameParts) > 1 ? implode(' ', array_slice($nameParts, 1)) : '';
+$customerName = $fullName;
+$email = '';
+
+$pdo = null;
+try {
+    $pdo = extra_store_pdo();
+} catch (\Throwable $error) {
+    fail('We could not connect to the database. Check your MAMP MySQL settings and database name.', 500, $wantsJson);
 }
 
-if (!isset($_FILES['payment_receipt']) || !is_array($_FILES['payment_receipt'])) {
-    fail('Please upload your payment receipt.', 422, $wantsJson);
+$product = extra_store_fetch_product($pdo, $productId);
+if (!$product) {
+    fail('Please choose a valid product.', 422, $wantsJson);
 }
 
-$receipt = $_FILES['payment_receipt'];
-if (($receipt['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-    fail('We could not read the uploaded receipt. Please try again.', 422, $wantsJson);
-}
+$productName = $product['name'];
+$productPrice = (int) $product['price'];
+$productTotal = $productPrice * $qty;
+$productCategory = $product['category'];
+$productImage = $product['image_primary'] ?: ($product['images'][0] ?? '');
+$productDescription = $product['description'];
 
-$maxReceiptSize = 8 * 1024 * 1024;
-if ((int) ($receipt['size'] ?? 0) > $maxReceiptSize) {
-    fail('Receipt file is too large. Please upload a file smaller than 8 MB.', 422, $wantsJson);
-}
+try {
+    $pdo->beginTransaction();
 
-$receiptName = basename((string) ($receipt['name'] ?? 'receipt'));
-$receiptTmp = (string) ($receipt['tmp_name'] ?? '');
-$receiptExtension = strtolower(pathinfo($receiptName, PATHINFO_EXTENSION));
-$allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
-if (!in_array($receiptExtension, $allowedExtensions, true)) {
-    fail('Receipt must be an image or PDF file.', 422, $wantsJson);
-}
+    $insert = $pdo->prepare(
+        'INSERT INTO orders (
+            order_number,
+            product_id,
+            product_name,
+            product_image,
+            product_description,
+            product_category,
+            qty,
+            unit_price,
+            total_price,
+            customer_name,
+            first_name,
+            last_name,
+            email,
+            address,
+            city,
+            state,
+            order_note,
+            receipt_original_name,
+            receipt_path,
+            status
+        ) VALUES (
+            :order_number,
+            :product_id,
+            :product_name,
+            :product_image,
+            :product_description,
+            :product_category,
+            :qty,
+            :unit_price,
+            :total_price,
+            :customer_name,
+            :first_name,
+            :last_name,
+            :email,
+            :address,
+            :city,
+            :state,
+            :order_note,
+            :receipt_original_name,
+            :receipt_path,
+            :status
+        )'
+    );
 
-if ($receiptTmp === '' || !is_uploaded_file($receiptTmp)) {
-    fail('We could not verify the uploaded receipt file.', 422, $wantsJson);
+    $insert->execute([
+        'order_number' => $orderNumber,
+        'product_id' => $productId,
+        'product_name' => $productName,
+        'product_image' => $productImage !== '' ? $productImage : ($product['images'][0] ?? ''),
+        'product_description' => $productDescription !== '' ? $productDescription : ($product['description'] ?? ''),
+        'product_category' => $productCategory,
+        'qty' => $qty,
+        'unit_price' => $productPrice,
+        'total_price' => $productTotal,
+        'customer_name' => $customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName),
+        'first_name' => $firstName,
+        'last_name' => $lastName,
+        'email' => $email,
+        'address' => $address,
+        'city' => '',
+        'state' => $state,
+        'order_note' => $orderNote,
+        'receipt_original_name' => '',
+        'receipt_path' => '',
+        'status' => 'pending'
+    ]);
+
+    $pdo->commit();
+} catch (\Throwable $error) {
+    if ($pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    fail('We could not save your order in the database. Please try again.', 500, $wantsJson);
 }
 
 $recipientEmail = 'hello@extrastore.com';
+$mailerAvailable = class_exists(\PHPMailer\PHPMailer\PHPMailer::class);
 
-$mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+$emailSent = false;
+$emailErrorMessage = '';
 
-try {
-    $mail->CharSet = 'UTF-8';
-    $mail->isMail();
-    $mail->setFrom('hello@extrastore.com', 'Extra Store');
-    $mail->addAddress($recipientEmail, 'Extra Store Orders');
-    if ($email !== '') {
-        $mail->addReplyTo($email, $customerName !== '' ? $customerName : 'Customer');
-    }
-    $mail->addAttachment($receiptTmp, $receiptName);
+if ($mailerAvailable) {
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
-    $mail->isHTML(true);
-    $mail->Subject = "New Order #{$orderNumber} - {$productName}";
+    try {
+        $mail->CharSet = 'UTF-8';
+        $mail->isMail();
+        $mail->setFrom('hello@extrastore.com', 'Extra Store');
+        $mail->addAddress($recipientEmail, 'Extra Store Orders');
 
-    $mail->Body = '
+        $mail->isHTML(true);
+        $mail->Subject = "New Order #{$orderNumber} - {$productName}";
+
+        $mail->Body = '
       <html>
         <body style="margin:0;padding:0;background:#f7f2ea;font-family:Arial,sans-serif;color:#2a1f1c;">
           <div style="max-width:680px;margin:0 auto;padding:24px;">
             <div style="background:#ffffff;border:1px solid #e8dcc4;border-radius:20px;padding:24px 28px;">
               <h1 style="margin:0 0 12px;font-size:24px;line-height:1.2;color:#7a1f2b;">New Extra Store Order</h1>
-              <p style="margin:0 0 18px;font-size:14px;line-height:1.6;">A customer just placed an order and uploaded their payment receipt.</p>
+              <p style="margin:0 0 18px;font-size:14px;line-height:1.6;">A customer just placed an order through the checkout form.</p>
               <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.6;">
                 <tr><td style="padding:6px 0;color:#8c7a66;width:180px;">Order number</td><td style="padding:6px 0;font-weight:700;">#' . htmlspecialchars($orderNumber, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Product</td><td style="padding:6px 0;font-weight:700;">' . htmlspecialchars($productName, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Category</td><td style="padding:6px 0;">' . htmlspecialchars($productCategory, ENT_QUOTES, 'UTF-8') . '</td></tr>
+                <tr><td style="padding:6px 0;color:#8c7a66;">Image</td><td style="padding:6px 0;">' . htmlspecialchars($productImage !== '' ? $productImage : 'Not provided', ENT_QUOTES, 'UTF-8') . '</td></tr>
+                <tr><td style="padding:6px 0;color:#8c7a66;">Description</td><td style="padding:6px 0;">' . htmlspecialchars($productDescription !== '' ? $productDescription : 'No description provided.', ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Quantity</td><td style="padding:6px 0;">' . number_format($qty) . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Unit price</td><td style="padding:6px 0;">₦' . number_format($productPrice) . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Total</td><td style="padding:6px 0;font-weight:700;">₦' . number_format($productTotal) . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Customer name</td><td style="padding:6px 0;">' . htmlspecialchars($customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName), ENT_QUOTES, 'UTF-8') . '</td></tr>
-                <tr><td style="padding:6px 0;color:#8c7a66;">Email</td><td style="padding:6px 0;">' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Address</td><td style="padding:6px 0;">' . htmlspecialchars($address, ENT_QUOTES, 'UTF-8') . '</td></tr>
-                <tr><td style="padding:6px 0;color:#8c7a66;">City</td><td style="padding:6px 0;">' . htmlspecialchars($city, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">State</td><td style="padding:6px 0;">' . htmlspecialchars($state, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Note</td><td style="padding:6px 0;">' . htmlspecialchars($orderNote !== '' ? $orderNote : 'No note provided.', ENT_QUOTES, 'UTF-8') . '</td></tr>
               </table>
-              <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#8c7a66;">Receipt attached: ' . htmlspecialchars($receiptName, ENT_QUOTES, 'UTF-8') . '</p>
             </div>
           </div>
         </body>
       </html>';
 
-    $mail->AltBody = implode("\n", [
-        'New Extra Store Order',
-        '',
-        'Order number: #' . $orderNumber,
-        'Product: ' . $productName,
-        'Category: ' . $productCategory,
-        'Quantity: ' . $qty,
-        'Unit price: ₦' . number_format($productPrice),
-        'Total: ₦' . number_format($productTotal),
-        'Customer name: ' . ($customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName)),
-        'Email: ' . $email,
-        'Address: ' . $address,
-        'City: ' . $city,
-        'State: ' . $state,
-        'Note: ' . ($orderNote !== '' ? $orderNote : 'No note provided.'),
-        'Receipt attached: ' . $receiptName
-    ]);
+        $mail->AltBody = implode("\n", [
+            'New Extra Store Order',
+            '',
+            'Order number: #' . $orderNumber,
+            'Product: ' . $productName,
+            'Category: ' . $productCategory,
+            'Image: ' . ($productImage !== '' ? $productImage : 'Not provided'),
+            'Description: ' . ($productDescription !== '' ? $productDescription : 'No description provided.'),
+            'Quantity: ' . $qty,
+            'Unit price: ₦' . number_format($productPrice),
+            'Total: ₦' . number_format($productTotal),
+            'Customer name: ' . ($customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName)),
+            'Address: ' . $address,
+            'State: ' . $state,
+            'Note: ' . ($orderNote !== '' ? $orderNote : 'No note provided.')
+        ]);
 
-    $mail->send();
-
-    respond([
-        'ok' => true,
-        'message' => 'Order email sent successfully.',
-        'orderNumber' => $orderNumber,
-        'product' => $productName
-    ], 200, $wantsJson);
-} catch (\Throwable $error) {
-    fail('PHPMailer could not send the order email: ' . $error->getMessage(), 500, $wantsJson);
+        $mail->send();
+        $emailSent = true;
+    } catch (\Throwable $error) {
+        $emailErrorMessage = $error->getMessage();
+    }
+} else {
+    $emailErrorMessage = 'PHPMailer is not installed yet. Run composer install to enable automatic email notifications.';
 }
+
+$responseMessage = $emailSent
+    ? 'Order saved successfully and the email was sent.'
+    : 'Order saved successfully, but the email notification could not be sent automatically. We still received your order in the database.';
+
+respond([
+    'ok' => true,
+    'message' => $responseMessage,
+    'orderNumber' => $orderNumber,
+    'product' => $productName,
+    'emailSent' => $emailSent,
+    'emailError' => $emailSent ? null : $emailErrorMessage
+], 200, $wantsJson);

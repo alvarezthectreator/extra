@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const store = window.ExtraStore;
   const purchaseDraftKey = 'extra-store-purchase-draft';
-  const products = typeof store.listProducts === 'function' ? store.listProducts() : Object.values(store.PRODUCTS || {});
+  let products = [];
 
   const form = document.getElementById('checkoutForm');
   const productSelect = document.getElementById('purchaseProduct');
@@ -15,12 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryImage = document.getElementById('purchaseSummaryImage');
   const summaryName = document.getElementById('purchaseSummaryName');
   const summaryCategory = document.getElementById('purchaseSummaryCategory');
+  const summaryDesc = document.getElementById('purchaseSummaryDesc');
   const summaryPrice = document.getElementById('purchaseSummaryPrice');
   const summaryQty = document.getElementById('purchaseSummaryQty');
   const summaryTotal = document.getElementById('purchaseSummaryTotal');
-  const receiptInput = document.getElementById('paymentReceipt');
   const submitButton = document.getElementById('placeOrderBtn');
   const successPanel = document.getElementById('checkoutSuccess');
+  const successImage = document.getElementById('checkoutSuccessImage');
+  const successImageLabel = document.getElementById('checkoutSuccessImageLabel');
   const successClose = document.querySelector('[data-popup-close]');
   const successOrderNumber = document.querySelector('[data-order-number]');
   const successCopy = document.getElementById('checkoutSuccessCopy');
@@ -48,12 +50,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const productId = params.get('product') || draft?.productId || fallback?.id || '';
     const qty = clampQty(params.get('qty') || draft?.qty || 1);
-    return { productId, qty };
+    const imageSrc = params.get('image') || draft?.imageSrc || '';
+    return { productId, qty, imageSrc };
   }
 
   function getSelectedProduct() {
     const productId = productSelect?.value || '';
     return store.getProduct(productId) || products[0] || null;
+  }
+
+  function getSelectedImage(product) {
+    if (!product) return '';
+    return product.image_primary || product.images?.[0] || '';
   }
 
   function getFieldValue(selector) {
@@ -66,15 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const qty = clampQty(qtyInput?.value || 1);
     const total = product.price * qty;
+    const previewImage = getSelectedImage(product);
 
     if (selectedName) selectedName.textContent = product.name;
     if (selectedPrice) selectedPrice.textContent = store.formatMoney(product.price);
     if (summaryImage) {
-      summaryImage.src = product.images[0];
+      summaryImage.src = previewImage;
       summaryImage.alt = product.name;
     }
     if (summaryName) summaryName.textContent = product.name;
     if (summaryCategory) summaryCategory.textContent = product.category;
+    if (summaryDesc) summaryDesc.textContent = product.description;
     if (summaryPrice) summaryPrice.textContent = store.formatMoney(product.price);
     if (summaryQty) summaryQty.textContent = String(qty);
     if (summaryTotal) summaryTotal.textContent = store.formatMoney(total);
@@ -82,11 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveDraft() {
     try {
+      const product = getSelectedProduct();
       sessionStorage.setItem(
         purchaseDraftKey,
         JSON.stringify({
           productId: productSelect?.value || '',
-          qty: clampQty(qtyInput?.value || 1)
+          qty: clampQty(qtyInput?.value || 1),
+          imageSrc: getSelectedImage(product)
         })
       );
     } catch (error) {
@@ -121,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function openSuccessPanel(orderNumber) {
+  function openSuccessPanel(orderNumber, message, product, imageSrc) {
     if (!successPanel) return;
 
     activeFocus = document.activeElement;
@@ -129,7 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
       successOrderNumber.textContent = `Order #${orderNumber}`;
     }
     if (successCopy) {
-      successCopy.textContent = 'Your order email has been sent successfully. Our team will review your receipt and confirm delivery soon.';
+      successCopy.textContent = message || 'Your order has been saved successfully. Our team will review it and confirm delivery soon.';
+    }
+    if (successImage && product) {
+      successImage.src = imageSrc || getSelectedImage(product);
+      successImage.alt = product.name;
+    }
+    if (successImageLabel && product) {
+      successImageLabel.textContent = product.name;
     }
 
     successPanel.classList.add('open');
@@ -152,61 +171,64 @@ document.addEventListener('DOMContentLoaded', () => {
     activeFocus = null;
   }
 
-  buildProductOptions();
-  applyDraft();
-  store.updateCartBadges();
+  function initializeCheckout() {
+    products = typeof store.listProducts === 'function' ? store.listProducts() : Object.values(store.PRODUCTS || {});
 
-  if (productSelect) {
-    productSelect.addEventListener('change', () => {
-      syncSummary();
-      saveDraft();
-    });
-  }
+    buildProductOptions();
+    applyDraft();
+    store.updateCartBadges();
 
-  if (qtyInput) {
-    qtyInput.addEventListener('input', () => {
-      qtyInput.value = String(clampQty(qtyInput.value));
-      syncSummary();
-      saveDraft();
-    });
-  }
+    if (productSelect) {
+      productSelect.addEventListener('change', () => {
+        syncSummary();
+        saveDraft();
+      });
+    }
 
-  if (qtyInc && qtyInput) {
-    qtyInc.addEventListener('click', () => {
-      qtyInput.value = String(Math.min(99, clampQty(qtyInput.value) + 1));
-      syncSummary();
-      saveDraft();
-    });
-  }
+    if (qtyInput) {
+      qtyInput.addEventListener('input', () => {
+        qtyInput.value = String(clampQty(qtyInput.value));
+        syncSummary();
+        saveDraft();
+      });
+    }
 
-  if (qtyDec && qtyInput) {
-    qtyDec.addEventListener('click', () => {
-      qtyInput.value = String(Math.max(1, clampQty(qtyInput.value) - 1));
-      syncSummary();
-      saveDraft();
-    });
-  }
+    if (qtyInc && qtyInput) {
+      qtyInc.addEventListener('click', () => {
+        qtyInput.value = String(Math.min(99, clampQty(qtyInput.value) + 1));
+        syncSummary();
+        saveDraft();
+      });
+    }
 
-  if (successClose) {
-    successClose.addEventListener('click', closeSuccessPanel);
-  }
+    if (qtyDec && qtyInput) {
+      qtyDec.addEventListener('click', () => {
+        qtyInput.value = String(Math.max(1, clampQty(qtyInput.value) - 1));
+        syncSummary();
+        saveDraft();
+      });
+    }
 
-  if (successPanel) {
-    successPanel.addEventListener('click', (event) => {
-      if (event.target === successPanel) {
+    if (successClose) {
+      successClose.addEventListener('click', closeSuccessPanel);
+    }
+
+    if (successPanel) {
+      successPanel.addEventListener('click', (event) => {
+        if (event.target === successPanel) {
+          closeSuccessPanel();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && successPanel?.classList.contains('open')) {
         closeSuccessPanel();
       }
     });
-  }
 
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && successPanel?.classList.contains('open')) {
-      closeSuccessPanel();
-    }
-  });
-
-  if (form) {
-    form.addEventListener('submit', async (event) => {
+    if (form) {
+      form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       if (isSubmitting) return;
@@ -217,16 +239,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (!receiptInput || receiptInput.files.length === 0) {
-        receiptInput?.focus();
-        store.showToast('Please upload your payment receipt.');
-        return;
-      }
-
       const qty = clampQty(qtyInput?.value || 1);
       const orderNumber = Math.floor(100000 + Math.random() * 900000);
       const formData = new FormData(form);
       const endpoint = form.getAttribute('action') || 'send-order.php';
+      const previewImage = getSelectedImage(product);
+      const fullName = getFieldValue('[name="full_name"]');
 
       formData.set('product', product.id);
       formData.set('qty', String(qty));
@@ -235,7 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.append('product_price', String(product.price));
       formData.append('product_total', String(product.price * qty));
       formData.append('product_category', product.category);
-      formData.append('customer_name', [getFieldValue('input[autocomplete="given-name"]'), getFieldValue('input[autocomplete="family-name"]')].filter(Boolean).join(' '));
+      formData.append('product_image', previewImage);
+      formData.append('product_description', product.description);
+      formData.append('full_name', fullName);
+      formData.append('customer_name', fullName);
 
       setSubmitting(true);
 
@@ -263,16 +284,23 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
         applyDraft();
         store.showToast(`Order email sent for ${payload.orderNumber || `#${orderNumber}`}`);
-        openSuccessPanel(payload.orderNumber || orderNumber);
+        openSuccessPanel(payload.orderNumber || orderNumber, payload.message, product, previewImage);
       } catch (error) {
         store.showToast(error?.message || 'Unable to send your order email.');
       } finally {
         setSubmitting(false);
       }
+      });
+    }
+
+    window.addEventListener('extra-store:cart-changed', () => {
+      store.updateCartBadges();
     });
   }
 
-  window.addEventListener('extra-store:cart-changed', () => {
-    store.updateCartBadges();
-  });
+  if (typeof store.whenReady === 'function') {
+    store.whenReady(initializeCheckout);
+  } else {
+    initializeCheckout();
+  }
 });

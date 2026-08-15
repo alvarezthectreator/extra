@@ -1,19 +1,15 @@
 (function () {
   const STORAGE_KEY = 'extra-store-cart';
 
-  const PRODUCTS = {
+  const DEFAULT_PRODUCTS = {
     'umbrella-red': {
       id: 'umbrella-red',
       name: 'Classic Red Auto Umbrella',
       price: 24000,
       color: 'Red',
       category: 'Travel Essential',
-      images: [
-        'assets/red-product-clean.png',
-        'assets/pink.jpg'
-      ],
-      description:
-        'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.'
+      images: ['assets/red-product-clean.png', 'assets/pink.jpg'],
+      description: 'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.'
     },
     'umbrella-green': {
       id: 'umbrella-green',
@@ -21,12 +17,8 @@
       price: 24000,
       color: 'Green',
       category: 'Travel Essential',
-      images: [
-        'assets/green.jpg',
-        'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg'
-      ],
-      description:
-        'A lightweight umbrella built for rain-ready protection and easy storage.'
+      images: ['assets/green.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg'],
+      description: 'A lightweight umbrella built for rain-ready protection and easy storage.'
     },
     'umbrella-blue': {
       id: 'umbrella-blue',
@@ -34,13 +26,8 @@
       price: 24000,
       color: 'Blue',
       category: 'Travel Essential',
-      images: [
-        'assets/blue.jpg',
-        'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg',
-        'assets/tfgh.png'
-      ],
-      description:
-        'A stylish compact umbrella with automatic open and close convenience.'
+      images: ['assets/blue.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg', 'assets/tfgh.png'],
+      description: 'A stylish compact umbrella with automatic open and close convenience.'
     },
     'umbrella-pink': {
       id: 'umbrella-pink',
@@ -49,8 +36,7 @@
       color: 'Pink',
       category: 'Travel Essential',
       images: ['assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg'],
-      description:
-        'A bright, practical umbrella with a soft finish and travel-friendly format.'
+      description: 'A bright, practical umbrella with a soft finish and travel-friendly format.'
     }
   };
 
@@ -59,6 +45,75 @@
       return JSON.parse(value ?? '');
     } catch (error) {
       return fallback;
+    }
+  }
+
+  function normalizeImages(images, primaryImage = '') {
+    const list = Array.isArray(images) ? images : [];
+    const normalized = [];
+
+    if (primaryImage) {
+      normalized.push(String(primaryImage).trim());
+    }
+
+    list.forEach((image) => {
+      const value = String(image ?? '').trim();
+      if (value) {
+        normalized.push(value);
+      }
+    });
+
+    return Array.from(new Set(normalized.filter(Boolean)));
+  }
+
+  function normalizeProduct(product) {
+    if (!product) return null;
+
+    const id = String(product.id ?? '').trim();
+    if (!id) return null;
+
+    const imagePrimary = String(product.image_primary ?? product.imagePrimary ?? '').trim();
+    const images = normalizeImages(product.images, imagePrimary);
+    const fallbackImage = images[0] || imagePrimary || '';
+
+    return {
+      id,
+      name: String(product.name ?? '').trim(),
+      price: Number(product.price) || 0,
+      color: String(product.color ?? '').trim(),
+      category: String(product.category ?? '').trim(),
+      image_primary: imagePrimary || fallbackImage,
+      images: images.length ? images : (fallbackImage ? [fallbackImage] : []),
+      description: String(product.description ?? '').trim()
+    };
+  }
+
+  function normalizeProductMap(source) {
+    const entries = Array.isArray(source) ? source.map((product) => [product?.id, product]) : Object.entries(source || {});
+
+    return entries.reduce((accumulator, [id, product]) => {
+      const normalized = normalizeProduct(product);
+      if (!normalized || !id) {
+        return accumulator;
+      }
+
+      accumulator[id] = normalized;
+      return accumulator;
+    }, {});
+  }
+
+  let PRODUCTS = normalizeProductMap(DEFAULT_PRODUCTS);
+  let resolveReady;
+  const ready = new Promise((resolve) => {
+    resolveReady = resolve;
+  });
+  let readyResolved = false;
+
+  function finishReady() {
+    if (readyResolved) return;
+    readyResolved = true;
+    if (typeof resolveReady === 'function') {
+      resolveReady(PRODUCTS);
     }
   }
 
@@ -223,7 +278,53 @@
     }, 1800);
   }
 
+  async function loadProducts() {
+    try {
+      const response = await fetch('products.php', {
+        headers: {
+          Accept: 'application/json'
+        },
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Products request failed with status ${response.status}`);
+      }
+
+      const payload = await response.json();
+      if (!payload || !payload.ok || !Array.isArray(payload.products)) {
+        throw new Error('Products payload was not valid.');
+      }
+
+      PRODUCTS = normalizeProductMap(payload.products);
+      if (window.ExtraStore) {
+        window.ExtraStore.PRODUCTS = PRODUCTS;
+      }
+      window.dispatchEvent(new CustomEvent('extra-store:products-changed', {
+        detail: { products: listProducts() }
+      }));
+    } catch (error) {
+      PRODUCTS = normalizeProductMap(DEFAULT_PRODUCTS);
+      if (window.ExtraStore) {
+        window.ExtraStore.PRODUCTS = PRODUCTS;
+      }
+    } finally {
+      finishReady();
+    }
+
+    return PRODUCTS;
+  }
+
+  function whenReady(callback) {
+    ready.then(() => {
+      if (typeof callback === 'function') {
+        callback(PRODUCTS);
+      }
+    });
+  }
+
   window.ExtraStore = {
+    DEFAULT_PRODUCTS,
     STORAGE_KEY,
     PRODUCTS,
     addItem,
@@ -235,14 +336,19 @@
     getCartSubtotal,
     getProduct,
     listProducts,
+    loadProducts,
     notifyCartChange,
     removeItem,
     setCart,
     setItemQty,
     showToast,
+    ready,
+    whenReady,
     updateCartBadges
   };
 
   document.addEventListener('DOMContentLoaded', updateCartBadges);
   window.addEventListener('storage', updateCartBadges);
+
+  loadProducts();
 })();

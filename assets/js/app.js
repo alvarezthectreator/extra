@@ -46,15 +46,144 @@ document.addEventListener('DOMContentLoaded', () => {
   const productResultsCount = document.getElementById('productResultsCount');
   const productResultsEmpty = document.getElementById('productResultsEmpty');
   const clearProductFilters = document.getElementById('clearProductFilters');
-  const productCards = Array.from(document.querySelectorAll('[data-product-card]'));
   const cartDrawerPanel = cartDrawer?.querySelector('.cart-drawer-panel') || cartDrawer;
 
   let activeProduct = null;
   let activeQty = 1;
+  let activeImageSrc = '';
   let modalTrigger = null;
   let modalFocusCleanup = null;
   let cartTrigger = null;
   let cartFocusCleanup = null;
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function getProductCards() {
+    return Array.from(productGrid?.querySelectorAll('[data-product-card]') || []);
+  }
+
+  function getProductImages(product) {
+    const images = Array.isArray(product?.images) ? product.images.filter(Boolean) : [];
+    const primary = String(product?.image_primary || '').trim();
+
+    if (primary && !images.includes(primary)) {
+      images.unshift(primary);
+    }
+
+    if (!images.length && primary) {
+      images.push(primary);
+    }
+
+    return images.length ? images : ['assets/red-product-clean.png'];
+  }
+
+  function getPrimaryProductImage(product) {
+    return getProductImages(product)[0] || 'assets/red-product-clean.png';
+  }
+
+  function renderProductCard(product, index) {
+    const images = getProductImages(product);
+    const slideCount = images.length;
+    const photoLabel = `${slideCount} photo${slideCount === 1 ? '' : 's'}`;
+    const slides = images
+      .map((src, imageIndex) => `
+        <div class="best-seller-slide" data-card-slider-slide>
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(product.name)} image ${imageIndex + 1}" class="best-seller-image">
+        </div>
+      `)
+      .join('');
+    const dots = images.length > 1
+      ? `
+        <div class="best-seller-dots" data-card-slider-dots>
+          ${images.map((_, dotIndex) => `
+            <button type="button" class="best-seller-dot${dotIndex === 0 ? ' active' : ''}" data-card-slider-dot data-slide-to="${dotIndex}" aria-label="Show image ${dotIndex + 1}"></button>
+          `).join('')}
+        </div>
+      `
+      : '';
+    const controls = images.length > 1
+      ? `
+        <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
+        <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
+      `
+      : '';
+
+    return `
+      <article
+        data-product-card
+        data-product-id="${escapeHtml(product.id)}"
+        data-product-name="${escapeHtml(product.name)}"
+        data-product-category="${escapeHtml(product.category)}"
+        data-product-color="${escapeHtml(product.color)}"
+        data-product-price="${escapeHtml(product.price)}"
+        data-product-tags="${escapeHtml([product.name, product.category, product.color, product.description].join(' '))}"
+        data-sort-order="${index + 1}"
+        class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]"
+      >
+        <div class="best-seller-media">
+          <div class="best-seller-slider" data-card-slider data-active-slide="0">
+            <div class="best-seller-track" data-card-slider-track>
+              ${slides}
+            </div>
+            ${controls}
+          </div>
+          <div class="best-seller-badge">Best Seller</div>
+        </div>
+        <div class="p-5 sm:p-6">
+          <div class="flex items-center justify-between gap-3">
+            <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">${escapeHtml(product.category)}</div>
+            <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">${photoLabel}</div>
+          </div>
+          <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">${escapeHtml(product.name)}</h3>
+          <p class="mt-2 text-sm leading-6 text-muted">${escapeHtml(product.description)}</p>
+          <div class="mt-4 flex items-end justify-between gap-3">
+            <div>
+              <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
+              <div class="mt-1 text-xl font-semibold text-ink">${store.formatMoney(product.price)}</div>
+            </div>
+            <div class="text-sm text-muted">1 piece</div>
+          </div>
+          <div class="mt-5">
+            <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]" data-product="${escapeHtml(product.id)}">
+              Purchase
+            </button>
+          </div>
+          ${dots}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderProductCatalog() {
+    if (!productGrid) return;
+
+    const products = store.listProducts();
+    const colors = Array.from(new Set(products.map((product) => product.color).filter(Boolean)));
+
+    if (productColorFilter) {
+      const currentValue = productColorFilter.value || 'all';
+      productColorFilter.innerHTML = [
+        '<option value="all">All colors</option>',
+        ...colors.map((color) => `<option value="${escapeHtml(color)}">${escapeHtml(color)}</option>`)
+      ].join('');
+      if (Array.from(productColorFilter.options).some((option) => option.value === currentValue)) {
+        productColorFilter.value = currentValue;
+      }
+    }
+
+    productGrid.innerHTML = products.map((product, index) => renderProductCard(product, index)).join('');
+
+    if (productResultsCount) {
+      productResultsCount.textContent = `${products.length} product${products.length === 1 ? '' : 's'}`;
+    }
+  }
 
   function runAfterPreloader(callback) {
     const preloader = window.ExtraStorePreloader;
@@ -66,11 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyCatalogFilters() {
-    if (!productGrid || !productCards.length) return;
+    if (!productGrid) return;
 
     const query = (productSearch?.value || '').trim().toLowerCase();
     const selectedColor = (productColorFilter?.value || 'all').toLowerCase();
     const sortMode = productSort?.value || 'featured';
+    const productCards = getProductCards();
 
     const matches = productCards.filter((card) => {
       const haystack = [
@@ -178,6 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
     activeProduct = product;
     modalTrigger = trigger;
     activeQty = 1;
+    const modalImages = getProductImages(product);
+    activeImageSrc = modalImages[0] || '';
 
     detailTitle.textContent = product.name;
     detailPrice.textContent = store.formatMoney(product.price);
@@ -189,21 +321,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (detailGallery) {
       detailGallery.innerHTML = '';
-      product.images.forEach((src, index) => {
+      modalImages.forEach((src, index) => {
         const thumb = document.createElement('button');
         thumb.type = 'button';
         thumb.className = `detail-thumb${index === 0 ? ' active' : ''}`;
-        thumb.innerHTML = `<img src="${src}" alt="${product.name} thumbnail ${index + 1}">`;
+        thumb.innerHTML = `<img src="${src}" alt="${escapeHtml(product.name)} thumbnail ${index + 1}">`;
         thumb.addEventListener('click', () => {
           detailGallery.querySelectorAll('.detail-thumb').forEach((item) => item.classList.remove('active'));
           thumb.classList.add('active');
           detailMainImage.src = src;
+          activeImageSrc = src;
         });
         detailGallery.appendChild(thumb);
       });
     }
 
-    detailMainImage.src = product.images[0];
+    detailMainImage.src = modalImages[0];
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('overflow-hidden');
@@ -237,10 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function goToCheckout() {
     if (!activeProduct) return;
+    const primaryImage = getPrimaryProductImage(activeProduct);
 
     const draft = {
       productId: activeProduct.id,
-      qty: activeQty
+      qty: activeQty,
+      imageSrc: primaryImage
     };
 
     try {
@@ -249,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
       /* ignore storage write failures */
     }
 
-    window.location.href = `checkout.html?product=${encodeURIComponent(activeProduct.id)}&qty=${encodeURIComponent(String(activeQty))}`;
+    window.location.href = `checkout.html?product=${encodeURIComponent(activeProduct.id)}&qty=${encodeURIComponent(String(activeQty))}&image=${encodeURIComponent(primaryImage)}`;
   }
 
   function openDrawer(trigger = null) {
@@ -362,13 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  document.querySelectorAll('.product-detail-trigger').forEach((trigger) => {
-    trigger.addEventListener('click', () => {
-      const productId = trigger.dataset.product || trigger.dataset.productId || '';
-      openModal(productId, trigger);
-    });
-  });
-
   if (productSearch) {
     productSearch.addEventListener('input', applyCatalogFilters);
   }
@@ -420,6 +548,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('click', (event) => {
+    const productTrigger = event.target.closest('.product-detail-trigger');
+    if (productTrigger) {
+      const productId = productTrigger.dataset.product || productTrigger.dataset.productId || '';
+      openModal(productId, productTrigger);
+      return;
+    }
+
     const control = event.target.closest('[data-card-slider-prev], [data-card-slider-next], [data-card-slider-dot]');
     if (!control) return;
 
@@ -503,12 +638,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  store.updateCartBadges();
-  initCardSliders();
-  initReadMoreBlocks();
-  renderDrawer();
-  syncModalState();
-  applyCatalogFilters();
+  store.whenReady(() => {
+    store.updateCartBadges();
+    renderProductCatalog();
+    initCardSliders();
+    initReadMoreBlocks();
+    renderDrawer();
+    syncModalState();
+    applyCatalogFilters();
+  });
+
+  window.addEventListener('extra-store:products-changed', () => {
+    renderProductCatalog();
+    initCardSliders();
+    applyCatalogFilters();
+  });
+
   // Hero entrance animations — wait for the preloader to finish first
   runAfterPreloader(function () {
     try {
