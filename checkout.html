@@ -32,8 +32,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/site.css">
+  <noscript>
+    <style>
+      body.is-preloading { overflow: auto !important; cursor: auto !important; }
+      body.is-preloading > :not([data-site-preloader]) { visibility: visible !important; }
+      .site-preloader { display: none !important; }
+    </style>
+  </noscript>
 </head>
-<body class="min-h-screen bg-[#faf7f2] font-sans text-ink">
+<body class="min-h-screen bg-[#faf7f2] font-sans text-ink is-preloading" aria-busy="true">
+  <div class="site-preloader" data-site-preloader role="status" aria-live="polite" aria-label="Loading Extra Store">
+    <div class="site-preloader-card">
+      <div class="site-preloader-mark" aria-hidden="true">
+        <span class="site-preloader-ring"></span>
+        <span class="site-preloader-sweep"></span>
+        <span class="site-preloader-core">☂</span>
+      </div>
+      <p class="site-preloader-title">Extra Store</p>
+      <p class="site-preloader-copy">Loading your collection</p>
+      <div class="site-preloader-bar" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
   <header class="sticky top-0 z-50 border-b border-line/80 bg-cream/90 backdrop-blur">
     <div class="mx-auto flex max-w-screen-2xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
       <a href="index.html" class="flex items-center gap-3">
@@ -237,6 +256,7 @@
     </div>
   </div>
 
+  <script src="assets/js/preloader.js"></script>
   <script src="assets/js/store.js"></script>
   <script src="assets/js/a11y.js"></script>
   <script src="assets/js/navigation.js" defer></script>

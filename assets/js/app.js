@@ -61,6 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return store.getCart().find((item) => item.id === id) || null;
   }
 
+  function runAfterPreloader(callback) {
+    const preloader = window.ExtraStorePreloader;
+    if (preloader && typeof preloader.whenReady === 'function') {
+      preloader.whenReady(callback);
+      return;
+    }
+    callback();
+  }
+
   function applyCatalogFilters() {
     if (!productGrid || !productCards.length) return;
 
@@ -544,8 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDrawer();
   syncModalState();
   applyCatalogFilters();
-  // Hero entrance animations — run after other app initialization
-  (function(){
+  // Hero entrance animations — wait for the preloader to finish first
+  runAfterPreloader(function () {
     try {
       var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) return;
@@ -567,9 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       /* ignore */
     }
-  })();
+  });
   // Animate hero image and CTAs with a float-in
-  (function(){
+  runAfterPreloader(function () {
     try {
       var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) return;
@@ -598,9 +607,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(function(){ btn.classList.add('animate-float-in'); }, 900 + (i * 160));
       });
     } catch (e) { /* ignore */ }
-  })();
+  });
   // Find and animate the specific paragraph text (bottom-up)
-  (function(){
+  runAfterPreloader(function () {
     try {
       var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) return;
@@ -614,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(function(){ found.classList.add('animate-slide-in-up'); }, 600);
       }
     } catch (e) { /* ignore */ }
-  })();
+  });
   // Initialize product carousel (minimal, unobtrusive)
   (function(){
     try {
