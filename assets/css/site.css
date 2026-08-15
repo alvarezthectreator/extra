@@ -231,3 +231,81 @@
   display: inline-flex !important;
   visibility: visible !important;
 }
+
+/* === Best Sellers card system === */
+
+/* rating stars */
+.star-rating { position: relative; display: inline-block; font-size: .85rem; line-height: 1; letter-spacing: 2px; }
+.stars-bg { color: #e5dfd0; }
+.stars-fg { position: absolute; inset: 0; overflow: hidden; white-space: nowrap; color: #f0a63d; }
+
+/* card entrance + hover */
+.product-card {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .5s ease, transform .5s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.product-card.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+.product-card:hover {
+  box-shadow: 0 24px 48px -18px rgba(36, 26, 22, 0.22);
+  border-color: rgba(122, 31, 43, 0.18);
+}
+
+.product-card-img {
+  transform-origin: 60% 100%;
+}
+.product-card:hover .product-card-img {
+  transform: scale(1.06) rotate(-1.2deg);
+}
+
+/* quick add panel, hidden until hover/focus */
+.quick-add-panel {
+  transform: translateY(10px);
+  opacity: 0;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+}
+.product-card:hover .quick-add-panel,
+.product-card:focus-within .quick-add-panel {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* wishlist heart */
+.wishlist-btn svg { transition: transform .3s ease, fill .3s ease, color .3s ease; }
+.wishlist-btn.active svg { fill: #7a1f2b; color: #7a1f2b; transform: scale(1.12); }
+.wishlist-btn:active svg { transform: scale(0.85); }
+
+.swatch-dot {
+  width: 16px; height: 16px; border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 0 1px rgba(36,26,22,0.12);
+}
+
+/* color filter swatches */
+.color-filter-btn { position: relative; }
+.color-filter-btn.active::after {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: 999px;
+  border: 2px solid #7a1f2b;
+}
+
+.badge-pop { animation: pop .4s cubic-bezier(.3,1.4,.4,1) both; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.added-flash { animation: flash 1s ease; }
+@keyframes flash {
+  0% { background-color: #241a16; }
+  30% { background-color: #16a34a; }
+  100% { background-color: #241a16; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card, .product-card-img, .quick-add-panel, .wishlist-btn svg, .badge-pop, .added-flash {
+    transition: none !important; animation: none !important; transform: none !important;
+  }
+  .product-card { opacity: 1; }
+}
