@@ -5,7 +5,7 @@
     'umbrella-red': {
       id: 'umbrella-red',
       name: 'Classic Red Auto Umbrella',
-      price: 18.14,
+      price: 24000,
       color: 'Red',
       category: 'Travel Essential',
       images: [
@@ -18,7 +18,7 @@
     'umbrella-green': {
       id: 'umbrella-green',
       name: 'Green Windproof Umbrella',
-      price: 23.19,
+      price: 24000,
       color: 'Green',
       category: 'Travel Essential',
       images: [
@@ -31,7 +31,7 @@
     'umbrella-blue': {
       id: 'umbrella-blue',
       name: 'Blue Compact Auto Umbrella',
-      price: 27.14,
+      price: 24000,
       color: 'Blue',
       category: 'Travel Essential',
       images: [
@@ -45,7 +45,7 @@
     'umbrella-pink': {
       id: 'umbrella-pink',
       name: 'Pink Compact Umbrella',
-      price: 29.99,
+      price: 24000,
       color: 'Pink',
       category: 'Travel Essential',
       images: ['assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg'],

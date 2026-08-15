@@ -58,6 +58,23 @@
   display: none;
 }
 
+/* Modern card appearance: remove heavy border and use soft shadow */
+.catalog-card {
+  border: none !important;
+  box-shadow: 0 12px 30px rgba(15, 15, 15, 0.06);
+}
+
+/* Small 'Tap to purchase' trigger style */
+.tap-to-purchase {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #6b7280; /* gray-500 */
+  font-size: 0.8125rem; /* 13px */
+  cursor: pointer;
+}
+.tap-to-purchase:focus { outline: 2px solid rgba(122,31,43,0.12); border-radius: 6px; }
+
 .fade-in-up {
   animation: fadeInUp 360ms ease both;
 }

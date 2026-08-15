@@ -120,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasItemsInCart = store.getCartCount() > 0;
 
     detailTitle.textContent = product.name;
-    detailPrice.textContent = store.formatMoney(product.price);
+    // Show Naira price label for product modal
+    detailPrice.textContent = '₦24,000 naira';
     detailDesc.textContent = product.description;
     detailQty.textContent = String(activeQty);
     detailAdd.textContent = existingEntry ? 'In Cart' : 'Add to Cart';
