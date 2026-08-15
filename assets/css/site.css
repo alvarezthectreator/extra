@@ -507,15 +507,6 @@ body.is-preloading .added-flash {
   text-shadow: 0 8px 18px rgba(122, 31, 43, 0.2);
 }
 
-.site-preloader-logo {
-  position: relative;
-  z-index: 1;
-  width: 3.2rem;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 18px rgba(122, 31, 43, 0.18));
-}
-
 .site-preloader-title {
   font-family: "Playfair Display", Georgia, serif;
   font-size: 1.25rem;
