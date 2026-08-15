@@ -412,11 +412,6 @@
               <h2 class="mt-2 font-serif text-3xl text-ink sm:text-4xl">Best Sellers at Extra Store</h2>
               <p class="mt-3 text-sm leading-6 text-muted">Search, filter, and sort to find the exact umbrella you want.</p>
             </div>
-            <div class="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-terracottaDark">
-              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">Swipe cards</span>
-              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">Tap add to cart</span>
-              <span class="rounded-full border border-line bg-white px-3 py-2 shadow-sm">View details</span>
-            </div>
             <div class="grid gap-3 sm:grid-cols-3 lg:w-[42rem]">
               <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
                 <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Search</span>
@@ -772,31 +767,67 @@
       <section class="w-full px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div class="mx-auto max-w-screen-2xl text-center">
           <h2 class="font-serif text-3xl text-ink sm:text-4xl">What customers say about Extra Store</h2>
+          <p class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted">Tap any review to open the full WhatsApp screenshot.</p>
           <div class="mt-10 grid gap-6 lg:grid-cols-3">
-            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
-              <div class="mb-3 text-sm text-gold">★★★★★</div>
-              <p class="text-sm leading-6 text-muted">The umbrella feels sturdy, folds neatly, and the red finish looks even better in person.</p>
-              <div class="mt-5 flex items-center gap-3">
-                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
-              <span class="text-sm font-semibold text-ink">Jane F.</span>
+            <details class="review-card rounded-[1.2rem] border border-line bg-white p-4 text-left">
+              <summary class="cursor-pointer list-none">
+                <div class="overflow-hidden rounded-[1rem] border border-line bg-[#f7f2ea]">
+                  <img src="assets/reviews/review-1.jpeg" alt="Customer WhatsApp review 1" class="h-56 w-full object-cover object-top">
+                </div>
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div class="text-sm font-semibold text-ink">Emmanuel Lagos</div>
+                    <div class="text-xs uppercase tracking-[0.14em] text-muted">Verified WhatsApp review</div>
+                  </div>
+                  <div class="text-sm text-gold">★★★★★</div>
+                </div>
+                <p class="mt-3 text-sm leading-6 text-muted">Received the package like a while ago. Very strong and the light is bright too.</p>
+                <span class="mt-4 inline-flex items-center rounded-full bg-[#fff5f3] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a1f2b]">Tap to expand</span>
+              </summary>
+              <div class="pt-4">
+                <img src="assets/reviews/review-1.jpeg" alt="Full customer WhatsApp review 1" class="review-full-image w-full rounded-[1rem] border border-line bg-[#faf7f2] object-contain">
               </div>
-            </article>
-            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
-              <div class="mb-3 text-sm text-gold">★★★★★</div>
-              <p class="text-sm leading-6 text-muted">Shipping was fast, the packaging looked great, and the product quality matched the photos perfectly.</p>
-              <div class="mt-5 flex items-center gap-3">
-                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
-              <span class="text-sm font-semibold text-ink">Helen S.</span>
+            </details>
+
+            <details class="review-card rounded-[1.2rem] border border-line bg-white p-4 text-left">
+              <summary class="cursor-pointer list-none">
+                <div class="overflow-hidden rounded-[1rem] border border-line bg-[#f7f2ea]">
+                  <img src="assets/reviews/review-2.jpeg" alt="Customer WhatsApp review 2" class="h-56 w-full object-cover object-top">
+                </div>
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div class="text-sm font-semibold text-ink">Helen S.</div>
+                    <div class="text-xs uppercase tracking-[0.14em] text-muted">Verified WhatsApp review</div>
+                  </div>
+                  <div class="text-sm text-gold">★★★★★</div>
+                </div>
+                <p class="mt-3 text-sm leading-6 text-muted">Got the umbrella and it looks sharp. Very portable too.</p>
+                <span class="mt-4 inline-flex items-center rounded-full bg-[#fff5f3] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a1f2b]">Tap to expand</span>
+              </summary>
+              <div class="pt-4">
+                <img src="assets/reviews/review-2.jpeg" alt="Full customer WhatsApp review 2" class="review-full-image w-full rounded-[1rem] border border-line bg-[#faf7f2] object-contain">
               </div>
-            </article>
-            <article class="rounded-[1rem] border border-line bg-white p-6 text-left">
-              <div class="mb-3 text-sm text-gold">★★★★★</div>
-              <p class="text-sm leading-6 text-muted">This is exactly the kind of everyday item I want from a store like this, practical, clean, and reliable.</p>
-              <div class="mt-5 flex items-center gap-3">
-                <div class="h-11 w-11 rounded-full bg-gradient-to-br from-[#e6c866] to-[#c9a227]"></div>
-              <span class="text-sm font-semibold text-ink">Amara L.</span>
+            </details>
+
+            <details class="review-card rounded-[1.2rem] border border-line bg-white p-4 text-left">
+              <summary class="cursor-pointer list-none">
+                <div class="overflow-hidden rounded-[1rem] border border-line bg-[#f7f2ea]">
+                  <img src="assets/reviews/review-3.jpeg" alt="Customer WhatsApp review 3" class="h-56 w-full object-cover object-top">
+                </div>
+                <div class="mt-4 flex items-center justify-between gap-3">
+                  <div>
+                    <div class="text-sm font-semibold text-ink">Amara L.</div>
+                    <div class="text-xs uppercase tracking-[0.14em] text-muted">Verified WhatsApp review</div>
+                  </div>
+                  <div class="text-sm text-gold">★★★★★</div>
+                </div>
+                <p class="mt-3 text-sm leading-6 text-muted">Umbrella is very strong and the light is so bright. More durable than expected.</p>
+                <span class="mt-4 inline-flex items-center rounded-full bg-[#fff5f3] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a1f2b]">Tap to expand</span>
+              </summary>
+              <div class="pt-4">
+                <img src="assets/reviews/review-3.jpeg" alt="Full customer WhatsApp review 3" class="review-full-image w-full rounded-[1rem] border border-line bg-[#faf7f2] object-contain">
               </div>
-            </article>
+            </details>
           </div>
         </div>
       </section>

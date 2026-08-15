@@ -173,6 +173,22 @@
   transform: scale(1.08);
 }
 
+.review-card > summary {
+  list-style: none;
+}
+
+.review-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.review-card[open] {
+  box-shadow: 0 20px 44px rgba(35, 22, 16, 0.08);
+}
+
+.review-full-image {
+  max-height: 70vh;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .best-seller-track,
   .best-seller-dot {

@@ -587,7 +587,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (img) {
         // apply a much slower float-in for the main hero image
-        setTimeout(function(){ img.classList.add('animate-float-in-slow'); }, 700);
+        setTimeout(function(){
+          img.classList.add('animate-float-in-slow');
+          img.addEventListener('animationend', function () {
+            img.classList.remove('animate-float-in-slow');
+          }, { once: true });
+        }, 700);
       }
       buttons.forEach(function(btn, i){
         setTimeout(function(){ btn.classList.add('animate-float-in'); }, 900 + (i * 160));
