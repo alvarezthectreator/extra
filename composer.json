@@ -1,0 +1,7 @@
+{
+  "name": "extra-store/landing-page",
+  "description": "Extra Store landing page and checkout mail handler",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  }
+}

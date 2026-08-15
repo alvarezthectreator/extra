@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extra Store — Checkout</title>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: "#fffdf8",
+            blush: "#f6ecd9",
+            terracotta: "#7a1f2b",
+            terracottaDark: "#5c141e",
+            gold: "#c9a227",
+            goldLight: "#e6c866",
+            ink: "#2a1f1c",
+            muted: "#8c7a66",
+            line: "#ecdfc2"
+          },
+          fontFamily: {
+            sans: ["Poppins", "Arial", "sans-serif"],
+            serif: ["Playfair Display", "Georgia", "serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <noscript>
+    <style>
+      body.is-preloading { overflow: auto !important; cursor: auto !important; }
+      body.is-preloading > :not([data-site-preloader]) { visibility: visible !important; }
+      .site-preloader { display: none !important; }
+    </style>
+  </noscript>
+</head>
+<body class="min-h-screen bg-[#faf7f2] font-sans text-ink is-preloading" aria-busy="true">
+  <div class="site-preloader" data-site-preloader role="status" aria-live="polite" aria-label="Loading Extra Store">
+    <div class="site-preloader-card">
+      <div class="site-preloader-mark" aria-hidden="true">
+        <span class="site-preloader-ring"></span>
+        <span class="site-preloader-sweep"></span>
+      </div>
+      <p class="site-preloader-title">Extra Store</p>
+      <p class="site-preloader-copy">Loading your collection</p>
+      <div class="site-preloader-bar" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+  <header class="sticky top-0 z-50 border-b border-line/80 bg-cream/90 backdrop-blur">
+    <div class="mx-auto flex max-w-screen-2xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="h-6 w-auto max-w-[5.5rem] object-contain sm:h-7 lg:h-8">
+      </a>
+      <nav class="hidden items-center gap-8 text-sm text-ink lg:flex">
+        <a class="transition hover:text-terracottaDark" href="index.html">Home</a>
+        <a class="transition hover:text-terracottaDark" href="index.html#featured-products">Shop</a>
+        <a class="transition hover:text-terracottaDark" href="checkout.html" aria-current="page">Checkout</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-lg shadow-sm" role="img" aria-label="Nigeria flag">🇳🇬</span>
+        <button type="button" data-nav-toggle aria-controls="mobileNav" aria-expanded="false" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm lg:hidden">☰</button>
+      </div>
+    </div>
+    <div data-nav-overlay class="site-nav-overlay lg:hidden"></div>
+    <aside id="mobileNav" data-nav-panel class="site-nav-panel lg:hidden">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="h-7 w-auto object-contain">
+        </a>
+        <button type="button" data-nav-close class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-2xl text-ink">×</button>
+      </div>
+      <nav class="mt-8 space-y-3">
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html">Home</a>
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html#featured-products">Shop</a>
+        <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="checkout.html" aria-current="page">Checkout</a>
+      </nav>
+      <div class="mt-8 rounded-[1.25rem] border border-line bg-white p-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Quick actions</p>
+        <div class="mt-3 grid gap-3">
+          <a href="index.html" class="inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-[#fff7f5] px-4 py-3 text-sm font-semibold text-[#7a1f2b]">Back Home</a>
+          <a href="index.html#featured-products" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white">View Products</a>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="px-4 py-6 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+    <div class="mx-auto max-w-screen-2xl">
+      <div class="page-surface rounded-[1.75rem] px-6 py-7 sm:px-8 sm:py-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">Secure Purchase</p>
+        <h1 class="mt-3 font-serif text-4xl text-ink sm:text-5xl">Complete Your Purchase</h1>
+        <p class="mt-3 text-sm text-muted">Choose your product, enter delivery details, upload your payment receipt, then send the order email to Extra Store.</p>
+      </div>
+
+      <div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <aside class="order-1 space-y-6 lg:order-2">
+          <div class="h-fit page-card rounded-[1.5rem] p-6 sm:p-7">
+            <h2 class="font-serif text-2xl text-ink">Purchase Summary</h2>
+            <div class="mt-5 overflow-hidden rounded-[1.25rem] border border-line bg-[#fffdf8]">
+              <img id="purchaseSummaryImage" src="assets/red-product-clean.png" alt="Selected product" class="h-64 w-full object-cover object-center">
+            </div>
+            <div class="mt-4">
+              <div id="purchaseSummaryName" class="text-lg font-semibold text-ink">Classic Red Auto Umbrella</div>
+              <div id="purchaseSummaryCategory" class="text-xs uppercase tracking-[0.14em] text-terracottaDark">Travel Essential</div>
+            </div>
+            <div class="mt-5 space-y-3 text-sm">
+              <div class="flex items-center justify-between">
+                <span class="text-muted">Unit price</span>
+                <span id="purchaseSummaryPrice" class="font-semibold text-ink">₦24,000</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-muted">Quantity</span>
+                <span id="purchaseSummaryQty" class="font-semibold text-ink">1</span>
+              </div>
+              <div class="border-t border-line pt-3">
+                <div class="flex items-center justify-between text-base">
+                  <span class="font-semibold text-ink">Total</span>
+                  <span id="purchaseSummaryTotal" class="font-semibold text-[#7a1f2b]">₦24,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-card rounded-[1.5rem] p-6 sm:p-7">
+            <h2 class="font-serif text-2xl text-ink">Payment Details</h2>
+            <p class="mt-2 text-sm leading-6 text-muted">Transfer the exact total below, then upload your receipt in the form.</p>
+            <div class="mt-5 space-y-4 rounded-[1.25rem] border border-line bg-[#fffdf8] p-5 text-sm">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Business name</div>
+                <div class="mt-1 font-semibold text-ink">Exras Store Venture</div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Account number</div>
+                <div class="mt-1 font-semibold text-ink">7068905261</div>
+              </div>
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.14em] text-muted">Bank</div>
+                <div class="mt-1 font-semibold text-ink">Moniepoint MFB</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="order-2 space-y-6 lg:order-1">
+          <form id="checkoutForm" class="page-card rounded-[1.5rem] p-6 sm:p-7" action="send-order.php" method="post" enctype="multipart/form-data">
+            <h2 class="font-serif text-2xl text-ink">Purchase Details</h2>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+              <label class="block sm:col-span-2">
+                <span class="mb-2 block text-sm font-medium text-ink">Product</span>
+                <select id="purchaseProduct" name="product" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none"></select>
+              </label>
+              <label class="block">
+                <span class="mb-2 block text-sm font-medium text-ink">Quantity</span>
+                <div class="qty-box w-full justify-between">
+                  <button type="button" class="qty-btn" id="qtyDec">−</button>
+                  <input id="purchaseQty" name="qty" type="number" min="1" max="99" value="1" class="w-14 bg-transparent text-center text-sm font-semibold text-ink outline-none">
+                  <button type="button" class="qty-btn" id="qtyInc">＋</button>
+                </div>
+              </label>
+              <div class="block rounded-[1rem] border border-line bg-[#fffdf8] p-4 text-sm text-muted sm:col-span-1">
+                <div class="text-xs font-semibold uppercase tracking-[0.14em] text-terracottaDark">Selected item</div>
+                <div id="purchaseSelectedName" class="mt-2 font-semibold text-ink">Loading product...</div>
+                <div id="purchaseSelectedPrice" class="mt-1 text-sm text-[#7a1f2b]">₦0</div>
+              </div>
+              <label class="block">
+                <span class="mb-2 block text-sm font-medium text-ink">First name</span>
+                <input type="text" name="first_name" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="First name" autocomplete="given-name" required>
+              </label>
+              <label class="block">
+                <span class="mb-2 block text-sm font-medium text-ink">Last name</span>
+                <input type="text" name="last_name" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="Last name" autocomplete="family-name" required>
+              </label>
+              <label class="block sm:col-span-2">
+                <span class="mb-2 block text-sm font-medium text-ink">Email</span>
+                <input type="email" name="email" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="Email address" autocomplete="email" required>
+              </label>
+              <label class="block sm:col-span-2">
+                <span class="mb-2 block text-sm font-medium text-ink">Address</span>
+                <input type="text" name="address" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="Street address" autocomplete="street-address" required>
+              </label>
+              <label class="block">
+                <span class="mb-2 block text-sm font-medium text-ink">City</span>
+                <input type="text" name="city" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="City" autocomplete="address-level2" required>
+              </label>
+              <label class="block">
+                <span class="mb-2 block text-sm font-medium text-ink">State</span>
+                <input type="text" name="state" class="w-full rounded-full border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="State" autocomplete="address-level1" required>
+              </label>
+              <label class="block sm:col-span-2">
+                <span class="mb-2 block text-sm font-medium text-ink">Order note</span>
+                <textarea id="orderNote" name="order_note" rows="4" class="w-full rounded-[1.2rem] border border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" placeholder="Any delivery notes or color preference?"></textarea>
+              </label>
+              <label class="block sm:col-span-2">
+                <span class="mb-2 block text-sm font-medium text-ink">Payment receipt</span>
+                <input id="paymentReceipt" name="payment_receipt" type="file" accept="image/*,.pdf" class="w-full rounded-[1rem] border border-dashed border-line bg-[#fffdf8] px-4 py-3 text-sm outline-none" required>
+                <p class="mt-2 text-xs leading-5 text-muted">After you submit, the order email will be sent with your receipt attached.</p>
+              </label>
+            </div>
+
+            <button id="placeOrderBtn" type="submit" class="mt-7 inline-flex w-full items-center justify-center rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#5c141e]">
+              Send Order
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="w-full border-t border-line/80 bg-[#2b0a0f] text-[#f6ecd9]">
+    <div class="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
+      <div class="grid gap-8 lg:grid-cols-[1.1fr_0.95fr_0.95fr]">
+        <div>
+          <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-4 h-8 w-auto object-contain">
+          <p class="max-w-md text-sm leading-6 text-[#d9c49a]">
+            Everyday essentials, smart finds, and practical products for life on the move.
+          </p>
+        </div>
+        <div>
+          <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Contact</h4>
+          <ul class="space-y-3 text-sm text-[#d9c49a]">
+            <li><a class="transition hover:text-white" href="tel:+2347068905261">Call: 07068905261</a></li>
+            <li><a class="transition hover:text-white" href="mailto:hello@extrastore.com">Email: hello@extrastore.com</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Socials</h4>
+          <ul class="space-y-3 text-sm text-[#d9c49a]">
+            <li><a class="transition hover:text-white" href="https://www.instagram.com/extra_storerix/" target="_blank" rel="noreferrer">Instagram: @extra_storerix</a></li>
+            <li><a class="transition hover:text-white" href="https://www.snapchat.com/add/extra_store" target="_blank" rel="noreferrer">Snapchat: @extra_store</a></li>
+            <li><a class="transition hover:text-white" href="https://www.tiktok.com/@extras_store" target="_blank" rel="noreferrer">TikTok: @extras_store</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76]">
+        © 2026 Extra Store. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <div id="checkoutSuccess" class="popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="checkoutSuccessTitle" aria-hidden="true">
+    <div class="popup-panel relative scale-in rounded-[1.5rem] p-6 sm:p-8">
+      <button type="button" data-popup-close class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-xl text-ink">×</button>
+      <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#fff7f5] text-2xl text-[#7a1f2b]">✓</div>
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">Email Sent</p>
+      <h2 id="checkoutSuccessTitle" class="mt-2 font-serif text-3xl text-ink">Thank you for your purchase</h2>
+      <p id="checkoutSuccessCopy" class="mt-3 text-sm leading-6 text-muted">We have received your order details and receipt. Our team will review and prepare your item for delivery.</p>
+      <p class="mt-3 text-sm font-semibold text-[#7a1f2b]"><span data-order-number>Order #000000</span></p>
+      <a href="index.html" class="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[#7a1f2b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]">Back to Home</a>
+    </div>
+  </div>
+
+  <script src="assets/js/preloader.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/a11y.js"></script>
+  <script src="assets/js/navigation.js" defer></script>
+  <script src="assets/js/checkout.js"></script>
+</body>
+</html>
