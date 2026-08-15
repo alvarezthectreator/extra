@@ -532,4 +532,53 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) { /* ignore */ }
   })();
+  // Initialize product carousel (minimal, unobtrusive)
+  (function(){
+    try {
+      var carousel = document.getElementById('productCarousel');
+      if (!carousel) return;
+      var track = carousel.querySelector('.carousel-track');
+      var prev = carousel.querySelector('.carousel-nav.prev');
+      var next = carousel.querySelector('.carousel-nav.next');
+      var dots = carousel.querySelector('.carousel-dots');
+      var cards = Array.from(track.children || []);
+      // create dots
+      cards.forEach(function(_, i){
+        var btn = document.createElement('button');
+        if (i===0) btn.classList.add('active');
+        btn.addEventListener('click', function(){
+          cards[i].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+          setActiveDot(i);
+        });
+        dots.appendChild(btn);
+      });
+      function setActiveDot(i){
+        Array.from(dots.children).forEach(function(b,idx){ b.classList.toggle('active', idx===i); });
+      }
+      prev.addEventListener('click', function(){
+        var idx = Math.max(0, visibleIndex()-1);
+        cards[idx].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+        setActiveDot(idx);
+      });
+      next.addEventListener('click', function(){
+        var idx = Math.min(cards.length-1, visibleIndex()+1);
+        cards[idx].scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+        setActiveDot(idx);
+      });
+      function visibleIndex(){
+        var center = track.scrollLeft + (track.clientWidth/2);
+        var idx = cards.findIndex(function(card){
+          var rect = card.getBoundingClientRect();
+          var cardLeft = card.offsetLeft;
+          var cardRight = cardLeft + card.offsetWidth;
+          return cardLeft <= center && cardRight >= center;
+        });
+        return idx === -1 ? 0 : idx;
+      }
+      // update dots on scroll
+      var onScroll = function(){ setActiveDot(visibleIndex()); };
+      track.addEventListener('scroll', debounce(onScroll, 100));
+      function debounce(fn, wait){ var t; return function(){ clearTimeout(t); t=setTimeout(fn, wait); }; }
+    } catch(e){ /* ignore */ }
+  })();
 });
