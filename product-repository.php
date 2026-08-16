@@ -77,7 +77,7 @@ function extra_store_product_defaults(): array
         [
             'id' => 'iron-clip-lamp',
             'name' => 'Compact Rechargeable Handheld Iron Portable Cordless Mini Iron Wireless Home Appliance Digital Display, Orange',
-            'price' => 3707,
+            'price' => 20000,
             'color' => 'Orange',
             'category' => 'Home Appliance',
             'image_primary' => 'assets/irons.png',
@@ -164,10 +164,98 @@ function extra_store_seed_default_products(PDO $pdo): void
     }
 }
 
+function extra_store_sync_iron_product(PDO $pdo): void
+{
+    $product = null;
+
+    foreach (extra_store_product_defaults() as $candidate) {
+        if (($candidate['id'] ?? '') === 'iron-clip-lamp') {
+            $product = $candidate;
+            break;
+        }
+    }
+
+    if (!$product) {
+        return;
+    }
+
+    $check = $pdo->prepare('SELECT price FROM products WHERE id = :id LIMIT 1');
+    $check->execute(['id' => $product['id']]);
+    $row = $check->fetch();
+
+    if (!$row) {
+        $insert = $pdo->prepare(
+            'INSERT INTO products (
+                id,
+                name,
+                price,
+                color,
+                category,
+                image_primary,
+                images_json,
+                description,
+                storefront
+            ) VALUES (
+                :id,
+                :name,
+                :price,
+                :color,
+                :category,
+                :image_primary,
+                :images_json,
+                :description,
+                :storefront
+            )'
+        );
+
+        $insert->execute([
+            'id' => $product['id'],
+            'name' => $product['name'],
+            'price' => $product['price'],
+            'color' => $product['color'],
+            'category' => $product['category'],
+            'image_primary' => $product['image_primary'],
+            'images_json' => json_encode($product['images'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '[]',
+            'description' => $product['description'],
+            'storefront' => $product['storefront'],
+        ]);
+
+        return;
+    }
+
+    if ((int) ($row['price'] ?? 0) === 3707) {
+        $update = $pdo->prepare(
+            'UPDATE products
+             SET name = :name,
+                 price = :price,
+                 color = :color,
+                 category = :category,
+                 image_primary = :image_primary,
+                 images_json = :images_json,
+                 description = :description,
+                 storefront = :storefront
+             WHERE id = :id'
+        );
+
+        $update->execute([
+            'id' => $product['id'],
+            'name' => $product['name'],
+            'price' => $product['price'],
+            'color' => $product['color'],
+            'category' => $product['category'],
+            'image_primary' => $product['image_primary'],
+            'images_json' => json_encode($product['images'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '[]',
+            'description' => $product['description'],
+            'storefront' => $product['storefront'],
+        ]);
+    }
+}
+
 function extra_store_bootstrap_catalog(PDO $pdo): void
 {
     extra_store_ensure_products_schema($pdo);
     extra_store_seed_default_products($pdo);
+    extra_store_sync_iron_product($pdo);
 }
 
 function extra_store_normalize_image_list($value, string $primaryImage = ''): array
