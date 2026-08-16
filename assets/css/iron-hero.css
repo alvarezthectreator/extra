@@ -7,14 +7,12 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(255, 250, 230, 0.55) 0%, transparent 38%),
-    radial-gradient(circle at 88% 6%, rgba(255, 244, 210, 0.45) 0%, transparent 42%),
-    radial-gradient(circle at 50% 100%, rgba(70, 45, 6, 0.35) 0%, transparent 55%),
-    repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.10) 0px, rgba(255, 255, 255, 0.10) 1px, transparent 1px, transparent 5px),
-    repeating-linear-gradient(112deg, rgba(90, 58, 8, 0.10) 0px, rgba(90, 58, 8, 0.10) 1px, transparent 1px, transparent 9px),
-    linear-gradient(135deg, #f6e2a0 0%, #edcf7c 8%, #dfb753 18%, #d4a52f 28%, #c9a227 40%, #b8860b 52%, #a8791b 64%, #8f6412 76%, #755110 88%, #573807 100%);
+  background: #b6852a url("../gold-background.jpg") center center / cover no-repeat;
   padding: 1.5rem 1rem 1.75rem;
+}
+
+.gold-texture-bg {
+  background: #b6852a url("../gold-background.jpg") center center / cover no-repeat;
 }
 
 @media (min-width: 640px) {
