@@ -2,11 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!window.ExtraStore) return;
 
   const pageConfig = window.ExtraStoreConfig || {};
-  const storefront = String(pageConfig.storefront || 'extra').trim().toLowerCase() === 'light' ? 'light' : 'extra';
-  const homeUrl = pageConfig.homeUrl || (storefront === 'light' ? 'light-index.html' : 'index.html');
-  const checkoutUrl = pageConfig.checkoutUrl || (storefront === 'light' ? 'light-checkout.html' : 'checkout.html');
-  const cartUrl = pageConfig.cartUrl || (storefront === 'light' ? 'light-cart.html' : 'cart.html');
-  const brandName = pageConfig.brandName || (storefront === 'light' ? 'Light' : 'Extra Store');
+  const storefrontValue = String(pageConfig.storefront || 'extra').trim().toLowerCase();
+  const storefront = storefrontValue === 'light' || storefrontValue === 'iron' ? storefrontValue : 'extra';
+  const homeUrl = pageConfig.homeUrl || (storefront === 'light' ? 'light-index.html' : storefront === 'iron' ? 'iron-index.html' : 'index.html');
+  const checkoutUrl = pageConfig.checkoutUrl || (storefront === 'light' ? 'light-checkout.html' : storefront === 'iron' ? 'iron-checkout.html' : 'checkout.html');
+  const cartUrl = pageConfig.cartUrl || (storefront === 'light' ? 'light-cart.html' : storefront === 'iron' ? 'iron-cart.html' : 'cart.html');
+  const brandName = pageConfig.brandName || (storefront === 'light' ? 'Light' : storefront === 'iron' ? 'Iron Store' : 'Extra Store');
 
   const store = window.ExtraStore;
 

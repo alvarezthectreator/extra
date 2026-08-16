@@ -2,6 +2,8 @@
   const config = window.ExtraStoreConfig || {};
   const storefrontValue = String(config.storefront || 'extra').trim().toLowerCase();
   const STOREFRONT = storefrontValue === 'light' ? 'light' : storefrontValue === 'iron' ? 'iron' : 'extra';
+  const currencySymbol = String(config.currencySymbol || '₦');
+  const currencyLocale = String(config.currencyLocale || 'en-NG');
   const PRODUCT_IDS = Array.isArray(config.productIds)
     ? config.productIds.map((id) => String(id || '').trim()).filter(Boolean)
     : [];
@@ -60,12 +62,12 @@
     },
     'iron-clip-lamp': {
       id: 'iron-clip-lamp',
-      name: 'Iron Rechargeable Clip-On Desk Lamp',
-      price: 19500,
-      color: 'Black',
-      category: 'Reading & Study',
+      name: 'Compact Rechargeable Handheld Iron Portable Cordless Mini Iron Wireless Home Appliance Digital Display, Orange',
+      price: 3707,
+      color: 'Orange',
+      category: 'Home Appliance',
       images: ['assets/iron-1.jpg', 'assets/iron-2.jpg', 'assets/iron-3.jpeg'],
-      description: 'A rechargeable clip-on desk lamp with a sturdy iron finish and soft eye-friendly lighting.',
+      description: 'Compact rechargeable handheld iron with a digital display, cordless convenience, and a travel-ready orange finish.',
       storefront: 'iron'
     }
   };
@@ -218,7 +220,7 @@
 
   function formatMoney(amount) {
     const value = Number(amount || 0);
-    return `₦${value.toLocaleString('en-NG', {
+    return `${currencySymbol}${value.toLocaleString(currencyLocale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
     })}`;

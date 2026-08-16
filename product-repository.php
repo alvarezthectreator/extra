@@ -76,13 +76,13 @@ function extra_store_product_defaults(): array
         ],
         [
             'id' => 'iron-clip-lamp',
-            'name' => 'Iron Rechargeable Clip-On Desk Lamp',
-            'price' => 19500,
-            'color' => 'Black',
-            'category' => 'Reading & Study',
+            'name' => 'Compact Rechargeable Handheld Iron Portable Cordless Mini Iron Wireless Home Appliance Digital Display, Orange',
+            'price' => 3707,
+            'color' => 'Orange',
+            'category' => 'Home Appliance',
             'image_primary' => 'assets/iron-1.jpg',
             'images' => ['assets/iron-1.jpg', 'assets/iron-2.jpg', 'assets/iron-3.jpeg'],
-            'description' => 'A rechargeable clip-on desk lamp with a sturdy iron finish and soft eye-friendly lighting.',
+            'description' => 'Compact rechargeable handheld iron with a digital display, cordless convenience, and a travel-ready orange finish.',
             'storefront' => 'iron',
         ],
     ];
