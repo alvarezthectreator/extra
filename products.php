@@ -11,7 +11,10 @@ require_once __DIR__ . '/product-repository.php';
 
 try {
     $pdo = extra_store_pdo();
-    $products = extra_store_fetch_products($pdo);
+    extra_store_bootstrap_catalog($pdo);
+
+    $storefront = extra_store_normalize_storefront((string) ($_GET['storefront'] ?? 'extra'));
+    $products = extra_store_fetch_products($pdo, $storefront);
 
     echo json_encode([
         'ok' => true,

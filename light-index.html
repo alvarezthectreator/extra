@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>extra store — everyday essentials</title>
+  <title>Light Store — Everyday Essentials</title>
   <style>
     @font-face {
       font-family: 'Sesbania';
@@ -191,6 +191,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/light-hero.css">
   <noscript>
     <style>
       body.is-preloading { overflow: auto !important; cursor: auto !important; }
@@ -200,13 +201,13 @@
   </noscript>
 </head>
 <body class="min-h-screen w-full overflow-x-hidden bg-cream text-ink font-sans is-preloading" aria-busy="true">
-  <div class="site-preloader" data-site-preloader role="status" aria-live="polite" aria-label="Loading Extra Store">
+  <div class="site-preloader" data-site-preloader role="status" aria-live="polite" aria-label="Loading Light Store">
     <div class="site-preloader-card">
       <div class="site-preloader-mark" aria-hidden="true">
         <span class="site-preloader-ring"></span>
         <span class="site-preloader-sweep"></span>
       </div>
-      <p class="site-preloader-title">extra store</p>
+      <p class="site-preloader-title">Light Store</p>
       <p class="site-preloader-copy">Loading your collection</p>
       <div class="site-preloader-bar" aria-hidden="true"><span></span></div>
     </div>
@@ -214,11 +215,11 @@
   <div class="w-full">
     <header class="sticky top-0 z-50 border-b border-line/80 bg-cream/90 backdrop-blur">
       <div class="mx-auto flex w-full max-w-screen-2xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/extra-store-logo.png" alt="Extra Store" class="h-10 w-auto object-contain">
+        <a href="light-index.html" class="flex items-center gap-3">
+          <img src="assets/extra-store-logo.png" alt="Light Store" class="h-10 w-auto object-contain">
         </a>
         <nav class="hidden items-center gap-8 text-sm text-ink lg:flex">
-          <a class="transition hover:text-terracottaDark" href="index.html">Home</a>
+          <a class="transition hover:text-terracottaDark" href="light-index.html">Home</a>
           <a class="transition hover:text-terracottaDark" href="#featured-products" data-scroll-target="featured-products">Shop</a>
           <details class="group relative">
             <summary class="flex cursor-pointer list-none items-center gap-1 transition hover:text-terracottaDark">
@@ -247,13 +248,13 @@
       <div data-nav-overlay class="site-nav-overlay lg:hidden"></div>
       <aside id="mobileNav" data-nav-panel class="site-nav-panel lg:hidden">
         <div class="flex items-center justify-between">
-          <a href="index.html" class="flex items-center gap-2">
-              <img src="assets/extra-store-logo.png" alt="Extra Store" class="h-8 w-auto object-contain">
+          <a href="light-index.html" class="flex items-center gap-2">
+              <img src="assets/extra-store-logo.png" alt="Light Store" class="h-8 w-auto object-contain">
             </a>
           <button type="button" data-nav-close class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-2xl text-ink">×</button>
         </div>
         <nav class="mt-8 space-y-3">
-          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="index.html">Home</a>
+          <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="light-index.html">Home</a>
           <a class="block rounded-[1rem] border border-line bg-white px-4 py-3 text-sm font-medium text-ink transition hover:bg-[#fff7f5]" href="#featured-products" data-scroll-target="featured-products">Shop</a>
           <details class="rounded-[1rem] border border-line bg-white px-4 py-3">
             <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-ink">
@@ -269,199 +270,105 @@
         <div class="mt-8 rounded-[1.25rem] border border-line bg-white p-4">
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-muted">Quick actions</p>
           <div class="mt-3 grid gap-3">
-            <a href="index.html" class="inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-[#fff7f5] px-4 py-3 text-sm font-semibold text-[#7a1f2b]">Back Home</a>
-            <a href="index.html#featured-products" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white">View Products</a>
+            <a href="light-index.html" class="inline-flex items-center justify-center rounded-full border border-[#7a1f2b]/15 bg-[#fff7f5] px-4 py-3 text-sm font-semibold text-[#7a1f2b]">Back Home</a>
+            <a href="light-index.html#featured-products" class="inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white">View Products</a>
           </div>
         </div>
       </aside>
     </header>
 
     <main class="w-full">
-      <section id="hero-scroll-section" class="relative w-full overflow-hidden bg-[radial-gradient(120%_160%_at_80%_10%,#7a1420_0%,#4a0e17_55%,#3a0a11_100%)] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-        <div class="hero-noise absolute inset-0"></div>
-        <div class="mx-auto max-w-screen-2xl relative overflow-hidden rounded-[2rem] px-5 py-6 text-white shadow-glow sm:px-8 sm:py-8 lg:px-14 lg:py-14">
-          <div class="relative z-10">
-          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-            <div class="flex items-center gap-3 self-start rounded-full bg-white/5 px-4 py-2 md:self-auto">
-              <div class="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-lg">◈</div>
-              <div>
-                <div class="text-sm font-semibold">Premium</div>
-                <div class="text-xs text-white/65">Quality Assured</div>
-              </div>
+      <section id="hero-scroll-section" class="light-hero">
+        <div class="light-hero__inner">
+
+          <div class="light-hero__badge">
+            <div class="light-hero__badge-icon">🛡</div>
+            <div>
+              <div class="light-hero__badge-title">Premium</div>
+              <div class="light-hero__badge-sub">Quality Assured</div>
             </div>
           </div>
 
-          <div class="grid items-center gap-8 min-w-0 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
-            <div class="order-1 min-w-0 space-y-5 lg:order-none lg:space-y-8">
-                <div class="hidden items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-goldLight sm:inline-flex">
-                <span class="h-2 w-2 rounded-full bg-goldLight"></span>
-                @extrastore
-              </div>
+          <div class="light-hero__grid">
+            <div class="light-hero__copy">
+              <p class="light-hero__eyebrow">New Collection 2026</p>
 
-              <div class="space-y-2 sm:space-y-3">
-                <h1 class="bg-[linear-gradient(90deg,#fff6d6_0%,#e1bf67_45%,#a86f12_100%)] bg-clip-text text-transparent font-black tracking-[-0.05em]">
-                  <span class="block text-[clamp(3.25rem,13vw,6.5rem)] leading-[0.9] sm:text-[clamp(4.25rem,8vw,7rem)]">Aiautomatic Portable umbrella</span>
-                </h1>
-              </div>
+              <h1 class="light-hero__heading">
+                <span class="light-hero__heading-line">Solar Powered</span>
+                <span class="light-hero__heading-script">Clip Lamp</span>
+              </h1>
 
-              <p class="max-w-md break-words text-sm leading-6 text-white/80 sm:max-w-xl sm:text-lg sm:leading-7">
-                Convenience, comfort, reliability, style, and value in one clean place. Extra Store keeps everyday essentials easy to shop and easy to love.
+              <p class="light-hero__subtext">
+                Clip, hang, or stand it anywhere extra light is needed. Soft, flicker-free light that charges with sunlight and runs up to 15 hours — perfect for reading, camping, power outages, and working late.
               </p>
 
-              <div class="hidden gap-2 text-sm text-white/80 sm:grid sm:grid-cols-2">
-                <div class="flex items-center gap-3">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/15 bg-white/8 text-[0.7rem] leading-none">✦</span>
+              <div class="light-hero__stats">
+                <div class="light-hero__stat">
+                  <span class="light-hero__stat-icon">🔒</span>
                   <div>
-                    <span class="font-semibold text-white">Convenience</span>
-                    <span class="ml-2 text-white/60">Essentials that make your day easier.</span>
+                    <div class="light-hero__stat-value">10K+</div>
+                    <div class="light-hero__stat-label">Happy Customers</div>
                   </div>
                 </div>
-                <div class="flex items-center gap-3">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/15 bg-white/8 text-[0.7rem] leading-none">♡</span>
+                <div class="light-hero__stat">
+                  <span class="light-hero__stat-icon light-hero__stat-icon--gold">★</span>
                   <div>
-                    <span class="font-semibold text-white">Comfort</span>
-                    <span class="ml-2 text-white/60">Products that bring ease, relaxation, and peace.</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/15 bg-white/8 text-[0.7rem] leading-none">✓</span>
-                  <div>
-                    <span class="font-semibold text-white">Reliability</span>
-                    <span class="ml-2 text-white/60">Quality you can trust, always.</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/15 bg-white/8 text-[0.7rem] leading-none">✧</span>
-                  <div>
-                    <span class="font-semibold text-white">Style</span>
-                    <span class="ml-2 text-white/60">Everyday essentials that fit your lifestyle.</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3 sm:col-span-2">
-                  <span class="flex h-6 w-6 flex-none items-center justify-center rounded-full border border-white/15 bg-white/8 text-[0.7rem] leading-none">🎁</span>
-                  <div>
-                    <span class="font-semibold text-white">Value</span>
-                    <span class="ml-2 text-white/60">Great essentials, fair prices.</span>
+                    <div class="light-hero__stat-value">4.9</div>
+                    <div class="light-hero__stat-label">Customer Rating</div>
                   </div>
                 </div>
               </div>
 
-              <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <a href="#featured-products" data-scroll-target="featured-products" class="inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(90deg,#fff6d6_0%,#e1bf67_45%,#a86f12_100%)] px-8 py-4 text-sm font-semibold text-[#4a0e17] shadow-[0_14px_30px_rgba(168,111,18,0.28)] transition hover:brightness-105 sm:w-auto">
-                  Shop Essentials
+              <div class="light-hero__actions">
+                <a href="#featured-products" data-scroll-target="featured-products" class="light-hero__btn light-hero__btn--primary">
+                  Explore Collection <span aria-hidden="true">→</span>
                 </a>
-                <a href="https://wa.me/2347068905261" target="_blank" rel="noreferrer" class="inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-white/5 px-8 py-4 text-sm font-medium text-white transition hover:bg-white/10 sm:w-auto">
-                  WhatsApp Us
+                <a href="https://wa.me/2347068905261" target="_blank" rel="noreferrer" class="light-hero__btn light-hero__btn--secondary">
+                  <span aria-hidden="true">▶</span> WhatsApp Us
                 </a>
               </div>
-
-              <p class="hidden text-sm font-semibold uppercase tracking-[0.24em] text-goldLight/90 sm:block">
-                Luxury & Swift.
-              </p>
             </div>
 
-            <div class="order-2 relative flex min-h-[280px] min-w-0 items-end justify-center lg:order-none lg:min-h-[620px]">
-              <div class="absolute right-6 top-10 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(230,200,102,0.35),transparent_70%)] blur-xl sm:right-16"></div>
-              <div class="absolute bottom-6 h-20 w-[90%] rounded-full border border-goldLight/40 bg-[radial-gradient(ellipse_at_center,#7a1f2b_0%,#5c141e_60%,transparent_75%)]"></div>
-              <div class="umbrella-shadow wall"></div>
-              <div class="umbrella-shadow floor"></div>
-              <div class="relative z-10 w-full max-w-[56rem] overflow-hidden rounded-[1.35rem] drop-shadow-[0_50px_70px_rgba(0,0,0,0.45)]">
+            <div class="light-hero__visual">
+              <div class="light-hero__visual-backdrop"></div>
+              <div class="light-hero__visual-shadow"></div>
+              <div class="light-hero__visual-image-wrap">
                 <img
-                  src="assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg"
-                  alt="Featured product"
-                  class="block h-auto w-full max-w-full object-contain"
+                  src="assets/lamp.png"
+                  alt="Solar clip lamp"
+                  class="light-hero__visual-image"
                 >
               </div>
             </div>
           </div>
 
-          <div class="hero-benefits-mobile mt-10 overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 sm:hidden">
-            <div class="hero-benefits-marquee flex w-max gap-3 p-4">
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Payment on Delivery</div>
-                  <div class="text-xs text-white/60">Pay when your order arrives</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">⟳</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Easy Returns</div>
-                  <div class="text-xs text-white/60">30-day return policy</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">▤</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Secure Payment</div>
-                  <div class="text-xs text-white/60">100% protected</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">24/7 Support</div>
-                  <div class="text-xs text-white/60">We're here to help</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4" aria-hidden="true">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Payment on Delivery</div>
-                  <div class="text-xs text-white/60">Pay when your order arrives</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4" aria-hidden="true">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">⟳</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Easy Returns</div>
-                  <div class="text-xs text-white/60">30-day return policy</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4" aria-hidden="true">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">▤</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">Secure Payment</div>
-                  <div class="text-xs text-white/60">100% protected</div>
-                </div>
-              </div>
-              <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4" aria-hidden="true">
-                <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
-                <div>
-                  <div class="text-sm font-semibold text-white">24/7 Support</div>
-                  <div class="text-xs text-white/60">We're here to help</div>
-                </div>
+          <div class="light-hero__benefits">
+            <div class="light-hero__benefit">
+              <span class="light-hero__benefit-icon">🛒</span>
+              <div>
+                <div class="light-hero__benefit-title">Free Shipping</div>
+                <div class="light-hero__benefit-sub">On orders over ₦50,000</div>
               </div>
             </div>
-          </div>
-          <div class="mt-10 hidden gap-5 rounded-[1.5rem] border border-white/10 bg-white/5 p-5 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:p-5 lg:grid-cols-4 lg:p-7">
-            <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4 sm:min-w-0">
-              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
+            <div class="light-hero__benefit">
+              <span class="light-hero__benefit-icon">⟳</span>
               <div>
-                <div class="text-sm font-semibold text-white">Payment on Delivery</div>
-                <div class="text-xs text-white/60">Pay when your order arrives</div>
+                <div class="light-hero__benefit-title">Easy Returns</div>
+                <div class="light-hero__benefit-sub">30-day return policy</div>
               </div>
             </div>
-            <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4 sm:min-w-0">
-              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">⟳</span>
+            <div class="light-hero__benefit">
+              <span class="light-hero__benefit-icon">🔒</span>
               <div>
-                <div class="text-sm font-semibold text-white">Easy Returns</div>
-                <div class="text-xs text-white/60">30-day return policy</div>
+                <div class="light-hero__benefit-title">Secure Payment</div>
+                <div class="light-hero__benefit-sub">100% protected</div>
               </div>
             </div>
-            <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4 sm:min-w-0">
-              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">▤</span>
+            <div class="light-hero__benefit">
+              <span class="light-hero__benefit-icon">🌐</span>
               <div>
-                <div class="text-sm font-semibold text-white">Secure Payment</div>
-                <div class="text-xs text-white/60">100% protected</div>
-              </div>
-            </div>
-            <div class="flex min-w-[13rem] flex-none items-center gap-4 rounded-[1.1rem] border border-white/10 bg-white/5 p-4 sm:min-w-0">
-              <span class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#faf3e6] text-lg text-black">◎</span>
-              <div>
-                <div class="text-sm font-semibold text-white">24/7 Support</div>
-                <div class="text-xs text-white/60">We're here to help</div>
+                <div class="light-hero__benefit-title">24/7 Support</div>
+                <div class="light-hero__benefit-sub">We're here to help</div>
               </div>
             </div>
           </div>
@@ -470,7 +377,7 @@
 
       <section class="w-full px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
         <div class="mx-auto max-w-5xl text-center">
-          <h2 class="font-serif text-3xl text-ink sm:text-4xl">Why shoppers choose Extra Store</h2>
+          <h2 class="font-serif text-3xl text-ink sm:text-4xl">Why shoppers choose Light Store</h2>
           <p class="mx-auto mt-3 max-w-2xl text-sm text-muted sm:text-base">
             Curated essentials that are practical, polished, and ready for everyday use.
           </p>
@@ -481,8 +388,8 @@
               Portable
             </div>
             <div class="flex flex-col items-center gap-3 text-sm text-ink">
-              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">⊘</div>
-              78 reinforce ribs
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">☀</div>
+              Solar Powered
             </div>
             <div class="flex flex-col items-center gap-3 text-sm text-ink">
               <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◌</div>
@@ -490,11 +397,11 @@
             </div>
             <div class="flex flex-col items-center gap-3 text-sm text-ink">
               <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◍</div>
-              Touch light
+              No Flicker, No Shadow
             </div>
             <div class="flex flex-col items-center gap-3 text-sm text-ink">
-              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">◐</div>
-              Automatic touch
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blush text-xl text-black">↻</div>
+              360° Flexible Neck
             </div>
           </div>
         </div>
@@ -506,7 +413,7 @@
             <div class="max-w-2xl">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#7a1f2b]">Browse the collection</p>
               <h2 class="mt-2 font-serif text-3xl text-ink sm:text-4xl">Our available product </h2>
-              <p class="mt-3 text-sm leading-6 text-muted">Search, filter, and sort to find the exact umbrella you want.</p>
+              <p class="mt-3 text-sm leading-6 text-muted">Search, filter, and sort to find the exact light you want.</p>
             </div>
             <div class="hidden gap-3 lg:grid lg:w-[42rem]">
               <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
@@ -517,9 +424,7 @@
                 <span class="mb-2 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Color</span>
                 <select id="productColorFilter" class="w-full bg-transparent text-sm outline-none">
                   <option value="all">All colors</option>
-                  <option value="Red">Red</option>
-                  <option value="Green">Green</option>
-                  <option value="Blue">Blue</option>
+                  <option value="White">White</option>
                 </select>
               </label>
               <label class="rounded-[1rem] border border-line bg-white px-4 py-3 shadow-sm">
@@ -534,144 +439,50 @@
             </div>
           </div>
           <div class="mt-5 hidden items-center justify-between gap-4 text-sm text-muted lg:flex">
-            <span id="productResultsCount">3 products</span>
+            <span id="productResultsCount">1 product</span>
             <button type="button" id="clearProductFilters" class="font-semibold text-[#7a1f2b] transition hover:text-[#5c141e]">
               Clear filters
             </button>
           </div>
           <div id="productGrid" class="mt-8 grid gap-6 lg:grid-cols-3">
-            <article data-product-card data-product-name="Classic Red Auto Umbrella" data-product-category="Travel Essential" data-product-color="Red" data-product-price="24000" data-product-tags="red compact travel umbrella" data-sort-order="1" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
+            <article data-product-card data-product-name="Solar Rechargeable Clip-On Desk Lamp" data-product-category="Reading &amp; Study" data-product-color="White" data-product-price="19500" data-product-tags="solar clip lamp desk reading study" data-sort-order="1" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
               <div class="best-seller-media">
                 <div class="best-seller-slider" data-card-slider data-active-slide="0">
                   <div class="best-seller-track" data-card-slider-track>
                     <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/1.jpeg" alt="Classic Red Auto Umbrella, image 1" class="best-seller-image">
+                      <img src="assets/imgi_1_1.jpg" alt="Solar Rechargeable Clip-On Desk Lamp, image 1" class="best-seller-image">
                     </div>
                     <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/2.jpeg" alt="Classic Red Auto Umbrella, image 2" class="best-seller-image">
+                      <img src="assets/imgi_4_4.jpg" alt="Solar Rechargeable Clip-On Desk Lamp, image 2" class="best-seller-image">
                     </div>
                     <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/3.jpeg" alt="Classic Red Auto Umbrella, image 3" class="best-seller-image">
+                      <img src="assets/imgi_5_5.jpeg" alt="Solar Rechargeable Clip-On Desk Lamp, image 3" class="best-seller-image">
                     </div>
                   </div>
-                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
-                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
                 </div>
-                <div class="best-seller-badge">Best Seller</div>
+                <div class="best-seller-badge">28% Off</div>
               </div>
               <div class="p-5 sm:p-6">
                 <div class="flex items-center justify-between gap-3">
-                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
-                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
+                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Reading &amp; Study</div>
+                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">★ 4.5 (2 ratings)</div>
                 </div>
-                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Classic Red Auto Umbrella</h3>
-                <p class="mt-2 text-sm leading-6 text-muted">Compact, wind-ready, and polished for everyday carry.</p>
+                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Solar Rechargeable Clip-On Desk Lamp with Adjustable Neck</h3>
+                <p class="mt-2 text-sm leading-6 text-muted">Clip it anywhere and get bright, flicker-free light that charges itself in the sun — perfect for reading, studying, and power outages.</p>
                 <div class="mt-4 flex items-end justify-between gap-3">
                   <div>
                     <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
-                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
+                    <div class="mt-1 flex items-baseline gap-2">
+                      <span class="text-xl font-semibold text-ink">₦19,500</span>
+                      <span class="text-sm text-muted line-through">₦27,000</span>
+                    </div>
                   </div>
                   <div class="text-sm text-muted">1 piece</div>
                 </div>
                 <div class="mt-5">
-                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]" data-product="umbrella-red">
+                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]" data-product="solar-clip-lamp">
                     Purchase
                   </button>
-                </div>
-                <div class="best-seller-dots" data-card-slider-dots>
-                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
-                </div>
-              </div>
-            </article>
-            <article data-product-card data-product-name="Green Windproof Umbrella" data-product-category="Travel Essential" data-product-color="Green" data-product-price="24000" data-product-tags="green windproof umbrella" data-sort-order="2" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
-              <div class="best-seller-media">
-                <div class="best-seller-slider" data-card-slider data-active-slide="0">
-                  <div class="best-seller-track" data-card-slider-track>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/2.jpeg" alt="Green Windproof Umbrella, image 1" class="best-seller-image">
-                    </div>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/2.jpeg" alt="Green Windproof Umbrella, image 2" class="best-seller-image">
-                    </div>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/3.jpeg" alt="Green Windproof Umbrella, image 3" class="best-seller-image">
-                    </div>
-                  </div>
-                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
-                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
-                </div>
-                <div class="best-seller-badge">Best Seller</div>
-              </div>
-              <div class="p-5 sm:p-6">
-                <div class="flex items-center justify-between gap-3">
-                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
-                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
-                </div>
-                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Green Windproof Umbrella</h3>
-                <p class="mt-2 text-sm leading-6 text-muted">A clean, lightweight profile made for unpredictable weather.</p>
-                <div class="mt-4 flex items-end justify-between gap-3">
-                  <div>
-                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
-                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
-                  </div>
-                  <div class="text-sm text-muted">1 piece</div>
-                </div>
-                <div class="mt-5">
-                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]" data-product="umbrella-green">
-                    Purchase
-                  </button>
-                </div>
-                <div class="best-seller-dots" data-card-slider-dots>
-                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
-                </div>
-              </div>
-            </article>
-            <article data-product-card data-product-name="Blue Compact Auto Umbrella" data-product-category="Travel Essential" data-product-color="Blue" data-product-price="24000" data-product-tags="blue compact auto umbrella" data-sort-order="3" class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]">
-              <div class="best-seller-media">
-                <div class="best-seller-slider" data-card-slider data-active-slide="0">
-                  <div class="best-seller-track" data-card-slider-track>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/3.jpeg" alt="Blue Compact Auto Umbrella, image 1" class="best-seller-image">
-                    </div>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/2.jpeg" alt="Blue Compact Auto Umbrella, image 2" class="best-seller-image">
-                    </div>
-                    <div class="best-seller-slide" data-card-slider-slide>
-                      <img src="assets/3.jpeg" alt="Blue Compact Auto Umbrella, image 3" class="best-seller-image">
-                    </div>
-                  </div>
-                  <button type="button" class="best-seller-nav prev" data-card-slider-prev aria-label="Previous product image">‹</button>
-                  <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
-                </div>
-                <div class="best-seller-badge">Best Seller</div>
-              </div>
-              <div class="p-5 sm:p-6">
-                <div class="flex items-center justify-between gap-3">
-                  <div class="text-[0.7rem] uppercase tracking-[0.12em] text-terracottaDark">Travel Essential</div>
-                  <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">3 photos</div>
-                </div>
-                <h3 class="mt-2 text-[1.05rem] font-semibold text-ink">Blue Compact Auto Umbrella</h3>
-                <p class="mt-2 text-sm leading-6 text-muted">A sleek compact shape with a polished finish and easy carry.</p>
-                <div class="mt-4 flex items-end justify-between gap-3">
-                  <div>
-                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-muted">Price</div>
-                    <div class="mt-1 text-xl font-semibold text-ink">₦24,000</div>
-                  </div>
-                  <div class="text-sm text-muted">1 piece</div>
-                </div>
-                <div class="mt-5">
-                  <button type="button" class="product-detail-trigger inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#5c141e]" data-product="umbrella-blue">
-                    Purchase
-                  </button>
-                </div>
-                <div class="best-seller-dots" data-card-slider-dots>
-                  <button type="button" class="best-seller-dot active" data-card-slider-dot data-slide-to="0" aria-label="Show image 1"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="1" aria-label="Show image 2"></button>
-                  <button type="button" class="best-seller-dot" data-card-slider-dot data-slide-to="2" aria-label="Show image 3"></button>
                 </div>
               </div>
             </article>
@@ -685,24 +496,24 @@
       <section id="new-arrivals" class="w-full px-4 py-4 sm:px-6 lg:px-8">
         <div class="mx-auto grid max-w-screen-2xl overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-line lg:grid-cols-2">
           <div class="flex aspect-square w-full items-center justify-center overflow-hidden bg-[#f4efe8] p-0">
-            <img src="assets/green.jpg" alt="Umbrella product view" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
+            <img src="assets/imgi_4_4.jpg" alt="Solar clip lamp product view" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
           </div>
           <div class="flex aspect-square w-full items-center bg-white px-6 py-8 text-black sm:px-10 lg:px-14">
             <div class="space-y-4 text-black">
               <h3 class="max-w-md font-serif text-2xl leading-tight text-black sm:text-3xl">
-                5 things to look for before you buy a folding umbrella
+                Perfect for multiple uses
               </h3>
               <p class="max-w-md text-sm leading-6 text-black/80">
-                A quick checklist to help you choose a folding umbrella that actually feels good to use every day.
+                Clip, hang, or stand it anywhere extra light is needed — a quick look at how our solar clip lamp fits into your day.
               </p>
               <ul class="space-y-3 text-sm leading-6 text-black" data-read-more-list>
-                <li><strong>Easy one-button open and close:</strong> Choose products that feel simple and reliable in daily use, especially when weather changes fast.</li>
-                <li><strong>Compact folding shape:</strong> A good umbrella should fit easily in your bag, backpack, or car without taking up space.</li>
-                <li><strong>Wind-resistant frame:</strong> Look for a durable structure that stays dependable during sudden gusts and heavy rain.</li>
-                <li class="hidden" data-read-more-item><strong>Comfortable coverage:</strong> The canopy should be wide enough to protect you without feeling bulky to carry.</li>
-                <li class="hidden" data-read-more-item><strong>Style that matches you:</strong> Extra Store offers clean, bold colors so you can choose the look that fits your everyday style.</li>
-                <li class="hidden" data-read-more-item><strong>Reliable materials:</strong> Durable fabric and quality finishing help keep your product looking good and working longer.</li>
-                <li class="hidden" data-read-more-item><strong>Lightweight build:</strong> A lighter product is easier to carry every day and more convenient for travel.</li>
+                <li><strong>Reading &amp; Studying:</strong> Ideal for homework, reading, and everyday tasks.</li>
+                <li><strong>Camping:</strong> Lights up the tent for outdoor fun.</li>
+                <li><strong>Power Outages / Emergencies:</strong> Reliable light exactly when you need it most.</li>
+                <li class="hidden" data-read-more-item><strong>Working Late:</strong> Great for late-night work in the dark.</li>
+                <li class="hidden" data-read-more-item><strong>Soft, comfortable light:</strong> Gentle on the eyes with no flicker and no shadow, unlike ordinary lamps.</li>
+                <li class="hidden" data-read-more-item><strong>Solar powered:</strong> Charges with sunlight or bright indoor light for up to 15 hours of lighting.</li>
+                <li class="hidden" data-read-more-item><strong>Adjustable 360° flexible neck:</strong> Bends and rotates to shine light exactly where you need it.</li>
               </ul>
               <button type="button" data-read-more-toggle class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#1d1d1d]">
                 <span data-read-more-label>Read more</span>
@@ -718,19 +529,19 @@
           <div class="order-2 flex aspect-square w-full items-center bg-white px-6 py-8 sm:px-10 lg:order-1 lg:px-14">
             <div class="space-y-4 w-full text-center text-black">
               <h3 class="mx-auto max-w-3xl font-serif text-2xl leading-tight text-black sm:text-3xl">
-                Everyday protection, made simple and stylish
+                Clip, hang, or stand — versatile and convenient
               </h3>
               <p class="mx-auto max-w-3xl text-sm leading-6 text-black/80">
-                A quick checklist to help you choose a folding umbrella that feels practical, durable, and easy to carry.
+                Mount or place the lamp anywhere you need extra light, with a design built for daily use.
               </p>
               <ul class="mx-auto max-w-3xl space-y-3 text-sm leading-6 text-black" data-read-more-list>
-                <li class="text-left"><strong>Weather-ready convenience:</strong> Pick items that help you move through rainy days without slowing down.</li>
-                <li class="text-left"><strong>Compact storage:</strong> Our products are designed to tuck away neatly when you’re not using them.</li>
-                <li class="text-left"><strong>Dependable build quality:</strong> Strong frame materials and careful finishing help products last longer.</li>
-                <li class="hidden text-left" data-read-more-item><strong>Comfortable coverage:</strong> Practical sizing helps keep you protected without feeling cumbersome.</li>
-                <li class="hidden text-left" data-read-more-item><strong>Clean color options:</strong> Bold red, classic black, blue, green, grey, and pink give you easy style choices.</li>
-                <li class="hidden text-left" data-read-more-item><strong>Travel friendly:</strong> Lightweight products are easier to carry every day or pack for trips.</li>
-                <li class="hidden text-left" data-read-more-item><strong>Designed for daily use:</strong> Extra Store products are built to be useful, attractive, and simple to live with.</li>
+                <li class="text-left"><strong>Secure clip-on mounting:</strong> Clips firmly onto desks, headboards, shelves, and more.</li>
+                <li class="text-left"><strong>Keyhole mounting hole:</strong> Hang it wherever you need light within reach.</li>
+                <li class="text-left"><strong>Bottom hole design:</strong> A versatile mounting option that adds even more flexibility.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Reduces eye strain:</strong> Soft, even light helps minimize headaches during long tasks.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Solar powered lamp:</strong> Charges with sunlight or bright light for energy-saving, portable use.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Up to 15 hours of lighting:</strong> A full charge keeps you covered for reading, camping, and emergencies.</li>
+                <li class="hidden text-left" data-read-more-item><strong>Adjustable 360° flexible neck:</strong> Easily position the light exactly where you need it, hands-free.</li>
               </ul>
               <button type="button" data-read-more-toggle class="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#1d1d1d]">
                 <span data-read-more-label>Read more</span>
@@ -739,7 +550,7 @@
             </div>
           </div>
           <div class="order-1 flex aspect-square w-full items-center justify-center overflow-hidden bg-gradient-to-br from-[#f6ecd9] to-[#f0e4d0] p-0 lg:order-2">
-            <img src="assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg" alt="Umbrella product color variation" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
+            <img src="assets/imgi_5_5.jpeg" alt="Solar clip lamp mounted and in use" class="h-full w-full object-cover object-center drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]">
           </div>
         </div>
       </section>
@@ -750,17 +561,17 @@
           <button class="detail-close" id="detailClose">×</button>
           <div class="grid gap-6 lg:grid-cols-2">
             <div>
-              <img id="detailMainImage" class="detail-main-image" src="assets/red-product-clean.png" alt="Product">
+              <img id="detailMainImage" class="detail-main-image" src="assets/imgi_1_1.jpg" alt="Solar Rechargeable Clip-On Desk Lamp">
               <div class="detail-gallery mt-4" id="detailGallery" role="list">
               </div>
             </div>
             <div>
               <div class="mb-3 inline-flex items-center rounded-full bg-[#fff5f3] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#7a1f2b]">Product</div>
-              <h3 id="detailTitle" class="font-serif text-2xl text-ink mb-2">Charging Intelligence Electric Umbrella</h3>
-              <div id="detailPrice" class="text-2xl font-bold text-[#7a1f2b]">₦39.99</div>
-              <p id="detailDesc" class="mt-4 text-sm text-muted">Full description goes here.</p>
+              <h3 id="detailTitle" class="font-serif text-2xl text-ink mb-2">Solar Rechargeable Clip-On Desk Lamp with Adjustable Neck</h3>
+              <div id="detailPrice" class="text-2xl font-bold text-[#7a1f2b]">₦19,500</div>
+              <p id="detailDesc" class="mt-4 text-sm text-muted">Bright, flicker-free light that clips onto your desk, bed, or shelf and charges itself in the sun.</p>
               <p class="mt-4 text-sm leading-6 text-ink/80">
-                Built for daily rain, travel, and easy carry, this compact umbrella combines a sturdy frame with a polished finish.
+                Runs on a long-lasting 1200mAh battery for up to 6–12 hours of light, with a built-in solar panel that charges during the day so you always have reliable light at night, even without electricity. Clip it anywhere and bend the flexible neck to any angle. The LED is bright, stable, and gentle on the eyes, making it ideal for students, night readers, office workers, and families who need dependable lighting during power outages.
               </p>
 
               <div class="mt-6">
@@ -787,7 +598,7 @@
 
       <section class="w-full px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <div class="mx-auto max-w-screen-2xl text-center">
-          <h2 class="font-serif text-3xl text-ink sm:text-4xl">What customers say about Extra Store</h2>
+          <h2 class="font-serif text-3xl text-ink sm:text-4xl">What customers say about Light Store</h2>
           <p class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted">Tap any review to open the full WhatsApp screenshot.</p>
           <div class="mt-10 grid gap-6 lg:grid-cols-3">
             <details class="review-card rounded-[1.2rem] border border-line bg-white p-4 text-left">
@@ -876,7 +687,7 @@
       <div class="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 lg:px-8">
         <div class="grid gap-8 lg:grid-cols-[1.15fr_0.95fr_0.9fr]">
           <div>
-            <img src="assets/extra-store-logo.png" alt="Extra Store logo" class="mb-4 h-8 w-auto object-contain">
+            <img src="assets/extra-store-logo.png" alt="Light Store logo" class="mb-4 h-8 w-auto object-contain">
             <p class="max-w-md text-sm leading-6 text-[#d9c49a]">
               Everyday essentials, smart finds, and practical products for life on the move.
             </p>
@@ -898,18 +709,28 @@
             <h4 class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white">Quick Links</h4>
             <ul class="space-y-3 text-sm text-[#d9c49a]">
               <li><a class="transition hover:text-white" href="#featured-products" data-scroll-target="featured-products">Shop</a></li>
-              <li><a class="transition hover:text-white" href="checkout.html">Checkout</a></li>
+              <li><a class="transition hover:text-white" href="light-checkout.html">Checkout</a></li>
             </ul>
           </div>
         </div>
         <div class="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-center text-xs text-[#b39d76] sm:flex-row sm:items-center sm:justify-between">
           <span>Luxury & Swift.</span>
-          <span>© 2026 Extra Store. All rights reserved.</span>
+          <span>© 2026 Light Store. All rights reserved.</span>
         </div>
       </div>
     </footer>
   </div>
 
+  <script>
+    window.ExtraStoreConfig = {
+      storefront: 'light',
+      brandName: 'Light Store',
+      homeUrl: 'light-index.html',
+      checkoutUrl: 'light-checkout.html',
+      cartUrl: 'light-cart.html',
+      productIds: ['solar-clip-lamp']
+    };
+  </script>
   <script src="assets/js/preloader.js"></script>
   <script src="assets/js/store.js"></script>
   <script src="assets/js/a11y.js"></script>

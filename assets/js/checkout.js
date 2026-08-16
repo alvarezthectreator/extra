@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.ExtraStore) return;
 
+  const pageConfig = window.ExtraStoreConfig || {};
+  const storefront = String(pageConfig.storefront || 'extra').trim().toLowerCase() === 'light' ? 'light' : 'extra';
   const store = window.ExtraStore;
-  const purchaseDraftKey = 'extra-store-purchase-draft';
+  const purchaseDraftKey = `${storefront}-store-purchase-draft`;
   let products = [];
 
   const form = document.getElementById('checkoutForm');

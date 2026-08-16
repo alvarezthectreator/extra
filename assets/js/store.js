@@ -1,5 +1,10 @@
 (function () {
-  const STORAGE_KEY = 'extra-store-cart';
+  const config = window.ExtraStoreConfig || {};
+  const STOREFRONT = String(config.storefront || 'extra').trim().toLowerCase() === 'light' ? 'light' : 'extra';
+  const PRODUCT_IDS = Array.isArray(config.productIds)
+    ? config.productIds.map((id) => String(id || '').trim()).filter(Boolean)
+    : [];
+  const STORAGE_KEY = `${STOREFRONT}-store-cart`;
 
   const DEFAULT_PRODUCTS = {
     'umbrella-red': {
@@ -9,7 +14,8 @@
       color: 'Red',
       category: 'Travel Essential',
       images: ['assets/red-product-clean.png', 'assets/pink.jpg'],
-      description: 'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.'
+      description: 'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.',
+      storefront: 'extra'
     },
     'umbrella-green': {
       id: 'umbrella-green',
@@ -18,7 +24,8 @@
       color: 'Green',
       category: 'Travel Essential',
       images: ['assets/green.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg'],
-      description: 'A lightweight umbrella built for rain-ready protection and easy storage.'
+      description: 'A lightweight umbrella built for rain-ready protection and easy storage.',
+      storefront: 'extra'
     },
     'umbrella-blue': {
       id: 'umbrella-blue',
@@ -27,7 +34,8 @@
       color: 'Blue',
       category: 'Travel Essential',
       images: ['assets/blue.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg', 'assets/tfgh.png'],
-      description: 'A stylish compact umbrella with automatic open and close convenience.'
+      description: 'A stylish compact umbrella with automatic open and close convenience.',
+      storefront: 'extra'
     },
     'umbrella-pink': {
       id: 'umbrella-pink',
@@ -36,7 +44,18 @@
       color: 'Pink',
       category: 'Travel Essential',
       images: ['assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg'],
-      description: 'A bright, practical umbrella with a soft finish and travel-friendly format.'
+      description: 'A bright, practical umbrella with a soft finish and travel-friendly format.',
+      storefront: 'extra'
+    },
+    'solar-clip-lamp': {
+      id: 'solar-clip-lamp',
+      name: 'Solar Rechargeable Clip-On Desk Lamp',
+      price: 19500,
+      color: 'White',
+      category: 'Reading & Study',
+      images: ['assets/imgi_1_1.jpg', 'assets/imgi_4_4.jpg', 'assets/imgi_5_5.jpeg'],
+      description: 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.',
+      storefront: 'light'
     }
   };
 
@@ -84,7 +103,8 @@
       category: String(product.category ?? '').trim(),
       image_primary: imagePrimary || fallbackImage,
       images: images.length ? images : (fallbackImage ? [fallbackImage] : []),
-      description: String(product.description ?? '').trim()
+      description: String(product.description ?? '').trim(),
+      storefront: String(product.storefront ?? '').trim().toLowerCase() === 'light' ? 'light' : 'extra'
     };
   }
 
@@ -102,7 +122,26 @@
     }, {});
   }
 
-  let PRODUCTS = normalizeProductMap(DEFAULT_PRODUCTS);
+  function filterProductsByStorefront(products) {
+    return Object.values(products || {}).reduce((accumulator, product) => {
+      if (String(product?.storefront || 'extra').trim().toLowerCase() !== STOREFRONT) {
+        return accumulator;
+      }
+
+      if (PRODUCT_IDS.length && !PRODUCT_IDS.includes(String(product?.id || '').trim())) {
+        return accumulator;
+      }
+
+      accumulator[product.id] = product;
+      return accumulator;
+    }, {});
+  }
+
+  function currentDefaultProducts() {
+    return filterProductsByStorefront(normalizeProductMap(DEFAULT_PRODUCTS));
+  }
+
+  let PRODUCTS = currentDefaultProducts();
   let resolveReady;
   const ready = new Promise((resolve) => {
     resolveReady = resolve;
@@ -280,7 +319,7 @@
 
   async function loadProducts() {
     try {
-      const response = await fetch('products.php', {
+      const response = await fetch(`products.php?storefront=${encodeURIComponent(STOREFRONT)}`, {
         headers: {
           Accept: 'application/json'
         },
@@ -296,7 +335,8 @@
         throw new Error('Products payload was not valid.');
       }
 
-      PRODUCTS = normalizeProductMap(payload.products);
+      const fetchedProducts = filterProductsByStorefront(normalizeProductMap(payload.products));
+      PRODUCTS = Object.keys(fetchedProducts).length ? fetchedProducts : currentDefaultProducts();
       if (window.ExtraStore) {
         window.ExtraStore.PRODUCTS = PRODUCTS;
       }
@@ -304,7 +344,7 @@
         detail: { products: listProducts() }
       }));
     } catch (error) {
-      PRODUCTS = normalizeProductMap(DEFAULT_PRODUCTS);
+      PRODUCTS = currentDefaultProducts();
       if (window.ExtraStore) {
         window.ExtraStore.PRODUCTS = PRODUCTS;
       }

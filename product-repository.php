@@ -1,6 +1,154 @@
 <?php
 declare(strict_types=1);
 
+function extra_store_normalize_storefront(string $value): string
+{
+    $value = strtolower(trim($value));
+
+    if ($value === 'light') {
+        return 'light';
+    }
+
+    return 'extra';
+}
+
+function extra_store_product_defaults(): array
+{
+    return [
+        [
+            'id' => 'umbrella-red',
+            'name' => 'Classic Red Auto Umbrella',
+            'price' => 24000,
+            'color' => 'Red',
+            'category' => 'Travel Essential',
+            'image_primary' => 'assets/red-product-clean.png',
+            'images' => ['assets/red-product-clean.png', 'assets/pink.jpg'],
+            'description' => 'A compact automatic umbrella with windproof protection and a polished red finish for everyday carry.',
+            'storefront' => 'extra',
+        ],
+        [
+            'id' => 'umbrella-green',
+            'name' => 'Green Windproof Umbrella',
+            'price' => 24000,
+            'color' => 'Green',
+            'category' => 'Travel Essential',
+            'image_primary' => 'assets/green.jpg',
+            'images' => ['assets/green.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg'],
+            'description' => 'A lightweight umbrella built for rain-ready protection and easy storage.',
+            'storefront' => 'extra',
+        ],
+        [
+            'id' => 'umbrella-blue',
+            'name' => 'Blue Compact Auto Umbrella',
+            'price' => 24000,
+            'color' => 'Blue',
+            'category' => 'Travel Essential',
+            'image_primary' => 'assets/blue.jpg',
+            'images' => ['assets/blue.jpg', 'assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg', 'assets/tfgh.png'],
+            'description' => 'A stylish compact umbrella with automatic open and close convenience.',
+            'storefront' => 'extra',
+        ],
+        [
+            'id' => 'umbrella-pink',
+            'name' => 'Pink Compact Umbrella',
+            'price' => 24000,
+            'color' => 'Pink',
+            'category' => 'Travel Essential',
+            'image_primary' => 'assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg',
+            'images' => ['assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg'],
+            'description' => 'A bright, practical umbrella with a soft finish and travel-friendly format.',
+            'storefront' => 'extra',
+        ],
+        [
+            'id' => 'solar-clip-lamp',
+            'name' => 'Solar Rechargeable Clip-On Desk Lamp',
+            'price' => 19500,
+            'color' => 'White',
+            'category' => 'Reading & Study',
+            'image_primary' => 'assets/imgi_1_1.jpg',
+            'images' => ['assets/imgi_1_1.jpg', 'assets/imgi_4_4.jpg', 'assets/imgi_5_5.jpeg'],
+            'description' => 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.',
+            'storefront' => 'light',
+        ],
+    ];
+}
+
+function extra_store_ensure_products_schema(PDO $pdo): void
+{
+    $columnExists = false;
+
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM products LIKE 'storefront'");
+        $columnExists = (bool) ($stmt && $stmt->fetch());
+    } catch (Throwable $error) {
+        $columnExists = false;
+    }
+
+    if (!$columnExists) {
+        $pdo->exec("ALTER TABLE products ADD COLUMN storefront VARCHAR(20) NOT NULL DEFAULT 'extra' AFTER description");
+    }
+
+    $pdo->exec("UPDATE products SET storefront = 'extra' WHERE storefront IS NULL OR storefront = ''");
+}
+
+function extra_store_seed_default_products(PDO $pdo): void
+{
+    $existingCount = (int) $pdo->query('SELECT COUNT(*) FROM products')->fetchColumn();
+    if ($existingCount > 0) {
+        return;
+    }
+
+    $check = $pdo->prepare('SELECT COUNT(*) FROM products WHERE id = :id');
+    $insert = $pdo->prepare(
+        'INSERT INTO products (
+            id,
+            name,
+            price,
+            color,
+            category,
+            image_primary,
+            images_json,
+            description,
+            storefront
+        ) VALUES (
+            :id,
+            :name,
+            :price,
+            :color,
+            :category,
+            :image_primary,
+            :images_json,
+            :description,
+            :storefront
+        )'
+    );
+
+    foreach (extra_store_product_defaults() as $product) {
+        $check->execute(['id' => $product['id']]);
+        if ((int) $check->fetchColumn() > 0) {
+            continue;
+        }
+
+        $insert->execute([
+            'id' => $product['id'],
+            'name' => $product['name'],
+            'price' => $product['price'],
+            'color' => $product['color'],
+            'category' => $product['category'],
+            'image_primary' => $product['image_primary'],
+            'images_json' => json_encode($product['images'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '[]',
+            'description' => $product['description'],
+            'storefront' => $product['storefront'],
+        ]);
+    }
+}
+
+function extra_store_bootstrap_catalog(PDO $pdo): void
+{
+    extra_store_ensure_products_schema($pdo);
+    extra_store_seed_default_products($pdo);
+}
+
 function extra_store_normalize_image_list($value, string $primaryImage = ''): array
 {
     $items = [];
@@ -41,6 +189,11 @@ function extra_store_product_from_row(array $row): array
 {
     $primaryImage = trim((string) ($row['image_primary'] ?? ''));
     $images = extra_store_normalize_image_list($row['images_json'] ?? null, $primaryImage);
+    $storefront = extra_store_normalize_storefront((string) ($row['storefront'] ?? ''));
+
+    if ($storefront === 'extra' && str_starts_with((string) ($row['id'] ?? ''), 'light-')) {
+        $storefront = 'light';
+    }
 
     return [
         'id' => (string) ($row['id'] ?? ''),
@@ -51,15 +204,25 @@ function extra_store_product_from_row(array $row): array
         'image_primary' => $primaryImage !== '' ? $primaryImage : ($images[0] ?? ''),
         'images' => $images,
         'description' => (string) ($row['description'] ?? ''),
+        'storefront' => $storefront,
         'created_at' => (string) ($row['created_at'] ?? ''),
         'updated_at' => (string) ($row['updated_at'] ?? ''),
     ];
 }
 
-function extra_store_fetch_products(PDO $pdo): array
+function extra_store_fetch_products(PDO $pdo, ?string $storefront = null): array
 {
-    $stmt = $pdo->query('SELECT * FROM products ORDER BY created_at ASC, id ASC');
-    $rows = $stmt ? $stmt->fetchAll() : [];
+    $storefront = $storefront !== null ? strtolower(trim($storefront)) : null;
+
+    if ($storefront === null || $storefront === '' || $storefront === 'all') {
+        $stmt = $pdo->query('SELECT * FROM products ORDER BY created_at ASC, id ASC');
+        $rows = $stmt ? $stmt->fetchAll() : [];
+    } else {
+        $storefront = extra_store_normalize_storefront($storefront);
+        $stmt = $pdo->prepare('SELECT * FROM products WHERE storefront = :storefront ORDER BY created_at ASC, id ASC');
+        $stmt->execute(['storefront' => $storefront]);
+        $rows = $stmt->fetchAll();
+    }
 
     return array_map('extra_store_product_from_row', is_array($rows) ? $rows : []);
 }
@@ -124,6 +287,7 @@ function extra_store_update_product(PDO $pdo, array $input): array
     $imagePrimary = trim((string) ($input['image_primary'] ?? ''));
     $imagesText = trim((string) ($input['images_text'] ?? ''));
     $description = trim((string) ($input['description'] ?? ''));
+    $storefront = extra_store_normalize_storefront((string) ($input['storefront'] ?? 'extra'));
 
     if ($name === '' || $color === '' || $category === '' || $imagePrimary === '' || $description === '') {
         throw new InvalidArgumentException('Please fill in all required product fields.');
@@ -143,7 +307,8 @@ function extra_store_update_product(PDO $pdo, array $input): array
              category = :category,
              image_primary = :image_primary,
              images_json = :images_json,
-             description = :description
+             description = :description,
+             storefront = :storefront
          WHERE id = :id'
     );
 
@@ -156,6 +321,7 @@ function extra_store_update_product(PDO $pdo, array $input): array
         'image_primary' => $imagePrimary,
         'images_json' => $imagesJson,
         'description' => $description,
+        'storefront' => $storefront,
     ]);
 
     return extra_store_fetch_product($pdo, $id) ?? [];
@@ -171,6 +337,7 @@ function extra_store_create_product(PDO $pdo, array $input): array
     $imagePrimary = trim((string) ($input['image_primary'] ?? ''));
     $imagesText = trim((string) ($input['images_text'] ?? ''));
     $description = trim((string) ($input['description'] ?? ''));
+    $storefront = extra_store_normalize_storefront((string) ($input['storefront'] ?? 'extra'));
 
     if ($name === '' || $color === '' || $category === '' || $imagePrimary === '' || $description === '') {
         throw new InvalidArgumentException('Please fill in all required product fields.');
@@ -192,7 +359,8 @@ function extra_store_create_product(PDO $pdo, array $input): array
             category,
             image_primary,
             images_json,
-            description
+            description,
+            storefront
         ) VALUES (
             :id,
             :name,
@@ -201,7 +369,8 @@ function extra_store_create_product(PDO $pdo, array $input): array
             :category,
             :image_primary,
             :images_json,
-            :description
+            :description,
+            :storefront
         )'
     );
 
@@ -214,6 +383,7 @@ function extra_store_create_product(PDO $pdo, array $input): array
         'image_primary' => $imagePrimary,
         'images_json' => $imagesJson,
         'description' => $description,
+        'storefront' => $storefront,
     ]);
 
     return extra_store_fetch_product($pdo, $id) ?? [];

@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.ExtraStore) return;
 
+  const pageConfig = window.ExtraStoreConfig || {};
+  const storefront = String(pageConfig.storefront || 'extra').trim().toLowerCase() === 'light' ? 'light' : 'extra';
+  const homeUrl = pageConfig.homeUrl || (storefront === 'light' ? 'light-index.html' : 'index.html');
+  const checkoutUrl = pageConfig.checkoutUrl || (storefront === 'light' ? 'light-checkout.html' : 'checkout.html');
+  const cartUrl = pageConfig.cartUrl || (storefront === 'light' ? 'light-cart.html' : 'cart.html');
+  const brandName = pageConfig.brandName || (storefront === 'light' ? 'Light' : 'Extra Store');
+
   const store = window.ExtraStore;
 
   const existingModal = document.getElementById('productModal');
@@ -28,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailModalPanel = modal?.querySelector('.detail-modal-panel') || modal;
   const newsletterForm = document.getElementById('newsletterForm');
   const newsletterEmail = document.getElementById('newsletterEmail');
-  const purchaseDraftKey = 'extra-store-purchase-draft';
+  const purchaseDraftKey = `${storefront}-store-purchase-draft`;
 
   const cartDrawer = document.getElementById('cartDrawer');
   const cartOverlay = document.querySelector('[data-cart-overlay]');
@@ -114,6 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <button type="button" class="best-seller-nav next" data-card-slider-next aria-label="Next product image">›</button>
       `
       : '';
+    const mediaContent = `
+      <div class="best-seller-slider" data-card-slider data-active-slide="0">
+        <div class="best-seller-track" data-card-slider-track>
+          ${slides}
+        </div>
+        ${controls}
+      </div>
+    `;
 
     return `
       <article
@@ -128,12 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         class="catalog-card best-seller-card fade-in-up overflow-hidden rounded-[1.6rem]"
       >
         <div class="best-seller-media">
-          <div class="best-seller-slider" data-card-slider data-active-slide="0">
-            <div class="best-seller-track" data-card-slider-track>
-              ${slides}
-            </div>
-            ${controls}
-          </div>
+          ${mediaContent}
           <div class="best-seller-badge">Best Seller</div>
         </div>
         <div class="p-5 sm:p-6">
@@ -384,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
       /* ignore storage write failures */
     }
 
-    window.location.href = `checkout.html?product=${encodeURIComponent(activeProduct.id)}&qty=${encodeURIComponent(String(activeQty))}&image=${encodeURIComponent(primaryImage)}`;
+    window.location.href = `${checkoutUrl}?product=${encodeURIComponent(activeProduct.id)}&qty=${encodeURIComponent(String(activeQty))}&image=${encodeURIComponent(primaryImage)}`;
   }
 
   function openDrawer(trigger = null) {
@@ -442,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#7a1f2b] text-lg text-white">🛒</div>
           <h4 class="font-serif text-xl text-ink">Your cart is empty</h4>
           <p class="mt-2 text-sm leading-6 text-muted">Add a few essentials and they will show up here right away.</p>
-          <a href="index.html#featured-products" class="mt-4 inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-5 py-2.5 text-sm font-semibold text-white">
+          <a href="${homeUrl}#featured-products" class="mt-4 inline-flex items-center justify-center rounded-full bg-[#7a1f2b] px-5 py-2.5 text-sm font-semibold text-white">
             Start Shopping
           </a>
         </div>
@@ -621,7 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      store.showToast('Thanks for joining the Extra Store list');
+      store.showToast(`Thanks for joining the ${brandName} list`);
       newsletterForm.reset();
     });
   }
@@ -717,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
       var targets = Array.from(document.querySelectorAll('p'));
       var found = targets.find(function(el){
         var txt = (el.textContent || '').replace(/\s+/g,' ').trim();
-        return txt.indexOf('Convenience, comfort') !== -1 || txt.indexOf('Extra Store keeps everyday') !== -1;
+        return txt.indexOf('Convenience, comfort') !== -1 || txt.indexOf('keeps everyday') !== -1;
       });
       if (found) {
         // small delay so it appears after hero
