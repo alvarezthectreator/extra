@@ -23,7 +23,8 @@ INSERT INTO products (id, name, price, color, category, image_primary, images_js
 ('umbrella-green', 'Green Windproof Umbrella', 24000, 'Green', 'Travel Essential', 'assets/green.jpg', '["assets/green.jpg","assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg"]', 'A lightweight umbrella built for rain-ready protection and easy storage.', 'extra'),
 ('umbrella-blue', 'Blue Compact Auto Umbrella', 24000, 'Blue', 'Travel Essential', 'assets/blue.jpg', '["assets/blue.jpg","assets/imgi_366_Hab9faf1e4c674af48cef4986f2494d0e7.jpg","assets/tfgh.png"]', 'A stylish compact umbrella with automatic open and close convenience.', 'extra'),
 ('umbrella-pink', 'Pink Compact Umbrella', 24000, 'Pink', 'Travel Essential', 'assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg', '["assets/WhatsApp Image 2026-08-13 at 18.35.25.jpeg"]', 'A bright, practical umbrella with a soft finish and travel-friendly format.', 'extra'),
-('solar-clip-lamp', 'Solar Rechargeable Clip-On Desk Lamp', 19500, 'White', 'Reading & Study', 'assets/imgi_1_1.jpg', '["assets/imgi_1_1.jpg","assets/imgi_4_4.jpg","assets/imgi_5_5.jpeg"]', 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.', 'light')
+('solar-clip-lamp', 'Solar Rechargeable Clip-On Desk Lamp', 19500, 'White', 'Reading & Study', 'assets/imgi_1_1.jpg', '["assets/imgi_1_1.jpg","assets/imgi_4_4.jpg","assets/imgi_5_5.jpeg"]', 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.', 'light'),
+('iron-clip-lamp', 'Iron Rechargeable Clip-On Desk Lamp', 19500, 'Black', 'Reading & Study', 'assets/iron-1.jpg', '["assets/iron-1.jpg","assets/iron-2.jpg","assets/iron-3.jpeg"]', 'A rechargeable clip-on desk lamp with a sturdy iron finish and soft eye-friendly lighting.', 'iron')
 ON DUPLICATE KEY UPDATE
   name = VALUES(name),
   price = VALUES(price),

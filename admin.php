@@ -230,6 +230,8 @@ if ($editorPrimary === '' && isset($editorValues['images'][0])) {
 $editorStorefront = extra_store_normalize_storefront((string) ($editorValues['storefront'] ?? 'extra'));
 $extraStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'extra'));
 $lightStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'light'));
+$ironStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'iron'));
+
 function admin_input_value($value): string
 {
     return admin_escape((string) $value);
@@ -237,7 +239,14 @@ function admin_input_value($value): string
 
 function admin_storefront_label(string $storefront): string
 {
-    return extra_store_normalize_storefront($storefront) === 'light' ? 'Lamp Store' : 'Umbrella Store';
+    $storefront = extra_store_normalize_storefront($storefront);
+    if ($storefront === 'light') {
+        return 'Lamp Store';
+    }
+    if ($storefront === 'iron') {
+        return 'Iron Store';
+    }
+    return 'Umbrella Store';
 }
 ?>
 <!DOCTYPE html>
@@ -848,9 +857,12 @@ function admin_storefront_label(string $storefront): string
           <a class="side-link active" href="admin.php">Products</a>
           <a class="side-link" href="index.html" target="_blank" rel="noreferrer">Storefront</a>
           <a class="side-link" href="light-index.html" target="_blank" rel="noreferrer">Light Storefront</a>
+          <a class="side-link" href="iron-index.html" target="_blank" rel="noreferrer">Iron Storefront</a>
           <a class="side-link" href="checkout.html" target="_blank" rel="noreferrer">Checkout</a>
           <a class="side-link" href="light-checkout.html" target="_blank" rel="noreferrer">Light Checkout</a>
+          <a class="side-link" href="iron-checkout.html" target="_blank" rel="noreferrer">Iron Checkout</a>
           <a class="side-link" href="light-cart.html" target="_blank" rel="noreferrer">Light Cart</a>
+          <a class="side-link" href="iron-cart.html" target="_blank" rel="noreferrer">Iron Cart</a>
         </div>
 
         <div class="side-group">
@@ -935,9 +947,10 @@ function admin_storefront_label(string $storefront): string
           </div>
 
           <div class="storefront-sections" id="productGrid">
-            <?php foreach ([
+          <?php foreach ([
               'extra' => ['label' => 'Umbrella Store', 'description' => 'All umbrella products from the main store.'],
               'light' => ['label' => 'Lamp Store', 'description' => 'All lamp products from the light store.'],
+              'iron' => ['label' => 'Iron Store', 'description' => 'All iron products from the iron store.'],
             ] as $storefrontKey => $storefrontMeta): ?>
               <?php
                 $storefrontProducts = array_values(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === $storefrontKey));
@@ -1058,6 +1071,10 @@ function admin_storefront_label(string $storefront): string
                 <strong><?php echo (int) $lightStorefrontCount; ?></strong>
                 <span>Lamp products</span>
               </div>
+              <div class="stat">
+                <strong><?php echo (int) $ironStorefrontCount; ?></strong>
+                <span>Iron products</span>
+              </div>
             </div>
           </section>
 
@@ -1127,6 +1144,7 @@ function admin_storefront_label(string $storefront): string
                   <select id="productStorefront" name="storefront" required>
                     <option value="extra"<?php echo $editorStorefront === 'extra' ? ' selected' : ''; ?>>Extra</option>
                     <option value="light"<?php echo $editorStorefront === 'light' ? ' selected' : ''; ?>>Light</option>
+                    <option value="iron"<?php echo $editorStorefront === 'iron' ? ' selected' : ''; ?>>Iron</option>
                   </select>
                 </div>
                 <div class="field">

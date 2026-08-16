@@ -9,6 +9,10 @@ function extra_store_normalize_storefront(string $value): string
         return 'light';
     }
 
+    if ($value === 'iron') {
+        return 'iron';
+    }
+
     return 'extra';
 }
 
@@ -69,6 +73,17 @@ function extra_store_product_defaults(): array
             'images' => ['assets/imgi_1_1.jpg', 'assets/imgi_4_4.jpg', 'assets/imgi_5_5.jpeg'],
             'description' => 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.',
             'storefront' => 'light',
+        ],
+        [
+            'id' => 'iron-clip-lamp',
+            'name' => 'Iron Rechargeable Clip-On Desk Lamp',
+            'price' => 19500,
+            'color' => 'Black',
+            'category' => 'Reading & Study',
+            'image_primary' => 'assets/iron-1.jpg',
+            'images' => ['assets/iron-1.jpg', 'assets/iron-2.jpg', 'assets/iron-3.jpeg'],
+            'description' => 'A rechargeable clip-on desk lamp with a sturdy iron finish and soft eye-friendly lighting.',
+            'storefront' => 'iron',
         ],
     ];
 }
@@ -193,6 +208,8 @@ function extra_store_product_from_row(array $row): array
 
     if ($storefront === 'extra' && str_starts_with((string) ($row['id'] ?? ''), 'light-')) {
         $storefront = 'light';
+    } elseif ($storefront === 'extra' && str_starts_with((string) ($row['id'] ?? ''), 'iron-')) {
+        $storefront = 'iron';
     }
 
     return [

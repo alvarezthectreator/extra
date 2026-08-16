@@ -1,6 +1,7 @@
 (function () {
   const config = window.ExtraStoreConfig || {};
-  const STOREFRONT = String(config.storefront || 'extra').trim().toLowerCase() === 'light' ? 'light' : 'extra';
+  const storefrontValue = String(config.storefront || 'extra').trim().toLowerCase();
+  const STOREFRONT = storefrontValue === 'light' ? 'light' : storefrontValue === 'iron' ? 'iron' : 'extra';
   const PRODUCT_IDS = Array.isArray(config.productIds)
     ? config.productIds.map((id) => String(id || '').trim()).filter(Boolean)
     : [];
@@ -56,6 +57,16 @@
       images: ['assets/imgi_1_1.jpg', 'assets/imgi_4_4.jpg', 'assets/imgi_5_5.jpeg'],
       description: 'A rechargeable clip-on desk lamp with adjustable neck, solar charging, and soft eye-friendly lighting.',
       storefront: 'light'
+    },
+    'iron-clip-lamp': {
+      id: 'iron-clip-lamp',
+      name: 'Iron Rechargeable Clip-On Desk Lamp',
+      price: 19500,
+      color: 'Black',
+      category: 'Reading & Study',
+      images: ['assets/iron-1.jpg', 'assets/iron-2.jpg', 'assets/iron-3.jpeg'],
+      description: 'A rechargeable clip-on desk lamp with a sturdy iron finish and soft eye-friendly lighting.',
+      storefront: 'iron'
     }
   };
 
@@ -104,7 +115,9 @@
       image_primary: imagePrimary || fallbackImage,
       images: images.length ? images : (fallbackImage ? [fallbackImage] : []),
       description: String(product.description ?? '').trim(),
-      storefront: String(product.storefront ?? '').trim().toLowerCase() === 'light' ? 'light' : 'extra'
+      storefront: ['light', 'iron'].includes(String(product.storefront ?? '').trim().toLowerCase())
+        ? String(product.storefront ?? '').trim().toLowerCase()
+        : 'extra'
     };
   }
 
