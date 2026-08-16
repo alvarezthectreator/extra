@@ -89,11 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
       images.push(primary);
     }
 
-    return images.length ? images : ['assets/red-product-clean.png'];
+    return images.length ? images : ['assets/1.jpeg'];
   }
 
   function getPrimaryProductImage(product) {
-    return getProductImages(product)[0] || 'assets/red-product-clean.png';
+    return getProductImages(product)[0] || 'assets/1.jpeg';
   }
 
   function renderProductCard(product, index) {
