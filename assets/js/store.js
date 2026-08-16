@@ -63,10 +63,16 @@
     'iron-clip-lamp': {
       id: 'iron-clip-lamp',
       name: 'Compact Rechargeable Handheld Iron Portable Cordless Mini Iron Wireless Home Appliance Digital Display, Orange',
-      price: 3707,
+      price: 20000,
       color: 'Orange',
       category: 'Home Appliance',
-      images: ['assets/iron-1.jpg', 'assets/iron-2.jpg', 'assets/iron-3.jpeg'],
+      images: [
+        'assets/irons.png',
+        'assets/imgi_168_8f55bbf1-d051-4f33-88f1-d9eadb78fbc5.jpg',
+        'assets/imgi_170_989c29a9-4407-4832-bcd1-81220c90b9be.jpeg',
+        'assets/imgi_197_55e6259d-a021-42e5-9a92-f38f920b8246.jpg',
+        'assets/imgi_21_46dd3813-eeab-4189-b5fa-aec62eb53fb4.jpg'
+      ],
       description: 'Compact rechargeable handheld iron with a digital display, cordless convenience, and a travel-ready orange finish.',
       storefront: 'iron'
     }
