@@ -81,6 +81,7 @@ $productTotal = $productPrice * $qty;
 $productCategory = $product['category'];
 $productImage = $product['image_primary'] ?: ($product['images'][0] ?? '');
 $productDescription = $product['description'];
+$adminEmail = extra_store_admin_email();
 
 try {
     $pdo->beginTransaction();
@@ -163,7 +164,7 @@ try {
     fail('We could not save your order in the database. Please try again.', 500, $wantsJson);
 }
 
-$recipientEmail = 'hello@extrastore.com';
+$recipientEmail = $adminEmail;
 $mailerAvailable = class_exists(\PHPMailer\PHPMailer\PHPMailer::class);
 
 $emailSent = false;
@@ -176,7 +177,7 @@ if ($mailerAvailable) {
         $mail->CharSet = 'UTF-8';
         $mail->isMail();
         $mail->setFrom('hello@extrastore.com', 'Extra Store');
-        $mail->addAddress($recipientEmail, 'Extra Store Orders');
+        $mail->addAddress($recipientEmail, 'Extra Store Admin');
 
         $mail->isHTML(true);
         $mail->Subject = "New Order #{$orderNumber} - {$productName}";

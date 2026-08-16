@@ -13,6 +13,13 @@ function extra_store_db_config(): array
     ];
 }
 
+function extra_store_admin_email(): string
+{
+    $email = trim((string) (getenv('EXTRA_STORE_ADMIN_EMAIL') ?: 'hello@extrastore.com'));
+
+    return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : 'hello@extrastore.com';
+}
+
 function extra_store_pdo(): PDO
 {
     static $pdo = null;
