@@ -115,7 +115,7 @@
 .light-hero__heading-line {
   display: block;
   font-family: "Playfair Display", Georgia, serif;
-  font-weight: 700;
+  font-weight: 600;
   color: #2a1f1c;
   font-size: clamp(2.75rem, 8vw, 5.25rem);
 }
@@ -174,7 +174,7 @@
 
 .light-hero__stat-value {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #2a1f1c;
   line-height: 1.2;
 }
@@ -204,7 +204,7 @@
   border-radius: 999px;
   padding: 1rem 2rem;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   transition: filter 160ms ease, background 160ms ease, transform 160ms ease;
   width: 100%;

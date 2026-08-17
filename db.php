@@ -15,9 +15,30 @@ function extra_store_db_config(): array
 
 function extra_store_admin_email(): string
 {
-    $email = trim((string) (getenv('EXTRA_STORE_ADMIN_EMAIL') ?: 'hello@extrastore.com'));
+    return 'wagwulageorge@gmail.com';
+}
 
-    return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : 'hello@extrastore.com';
+function extra_store_mailer_config(): array
+{
+    $transport = strtolower(trim((string) (getenv('EXTRA_STORE_MAIL_TRANSPORT') ?: 'smtp')));
+    $host = trim((string) (getenv('EXTRA_STORE_SMTP_HOST') ?: 'mail.mocktailcanapes.com'));
+    $username = trim((string) (getenv('EXTRA_STORE_SMTP_USERNAME') ?: 'test@mocktailcanapes.com'));
+    $password = (string) (getenv('EXTRA_STORE_SMTP_PASSWORD') ?: 'Alvarez.1000');
+    $fromEmail = trim((string) (getenv('EXTRA_STORE_FROM_EMAIL') ?: 'test@mocktailcanapes.com'));
+    $fromName = trim((string) (getenv('EXTRA_STORE_FROM_NAME') ?: 'Extra Store'));
+    $encryption = strtolower(trim((string) (getenv('EXTRA_STORE_SMTP_ENCRYPTION') ?: 'ssl')));
+    $port = (int) (getenv('EXTRA_STORE_SMTP_PORT') ?: 465);
+
+    return [
+        'transport' => in_array($transport, ['mail', 'smtp'], true) ? $transport : 'mail',
+        'host' => $host,
+        'username' => $username,
+        'password' => $password,
+        'from_email' => filter_var($fromEmail, FILTER_VALIDATE_EMAIL) ? $fromEmail : 'wagwulageorge@gmail.com',
+        'from_name' => $fromName !== '' ? $fromName : 'Extra Store',
+        'encryption' => in_array($encryption, ['tls', 'ssl', ''], true) ? $encryption : 'tls',
+        'port' => $port > 0 ? $port : 587,
+    ];
 }
 
 function extra_store_pdo(): PDO

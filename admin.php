@@ -209,6 +209,23 @@ foreach ($products as $product) {
     }
 }
 
+$recentOrders = [];
+$orderCount = 0;
+$pendingOrderCount = 0;
+
+try {
+    $recentOrdersStmt = $pdo->query(
+        'SELECT order_number, product_name, customer_name, total_price, state, status, created_at
+         FROM orders
+         ORDER BY created_at DESC, id DESC'
+    );
+    $recentOrders = $recentOrdersStmt ? $recentOrdersStmt->fetchAll() : [];
+    $orderCount = (int) $pdo->query('SELECT COUNT(*) FROM orders')->fetchColumn();
+    $pendingOrderCount = (int) $pdo->query("SELECT COUNT(*) FROM orders WHERE status = 'pending'")->fetchColumn();
+} catch (Throwable $error) {
+    $recentOrders = [];
+}
+
 $editorValues = $selectedProduct ?? [
     'id' => '',
     'name' => '',
@@ -272,6 +289,7 @@ function admin_storefront_label(string $storefront): string
       --danger: #ef4444;
       --success: #16a34a;
       --shadow: 0 18px 45px rgba(29, 41, 57, 0.08);
+      --sidebar-width: 292px;
     }
     * { box-sizing: border-box; }
     html, body { min-height: 100%; }
@@ -287,25 +305,53 @@ function admin_storefront_label(string $storefront): string
     button, input, textarea, select { font: inherit; }
     .layout {
       display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
       min-height: 100vh;
+      position: relative;
     }
     .sidebar {
       position: sticky;
       top: 0;
       align-self: start;
       height: 100vh;
-      padding: 22px 18px;
-      background: rgba(255, 255, 255, 0.9);
+      padding: 18px;
+      background:
+        radial-gradient(circle at top right, rgba(107, 78, 255, 0.06), transparent 30%),
+        rgba(255, 255, 255, 0.94);
       border-right: 1px solid var(--line);
       backdrop-filter: blur(12px);
       overflow: auto;
+      z-index: 40;
+    }
+    .sidebar-shell {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sidebar-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .sidebar-close {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.2rem;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      cursor: pointer;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 24px;
       font-weight: 800;
       letter-spacing: 0.04em;
     }
@@ -319,7 +365,13 @@ function admin_storefront_label(string $storefront): string
       color: var(--accent);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
     }
-    .side-group { margin-top: 22px; }
+    .side-group {
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(248, 250, 255, 0.92);
+    }
+    .side-group + .side-group { margin-top: 0; }
     .side-title {
       color: var(--muted);
       font-size: 0.72rem;
@@ -338,6 +390,12 @@ function admin_storefront_label(string $storefront): string
       color: #334155;
       text-decoration: none;
       margin-bottom: 8px;
+      transition: background 120ms ease, transform 120ms ease, color 120ms ease;
+    }
+    .side-link:hover,
+    .side-item:hover {
+      background: #f2f6ff;
+      transform: translateX(1px);
     }
     .side-link.active,
     .side-item.active {
@@ -351,7 +409,7 @@ function admin_storefront_label(string $storefront): string
       border-left: 1px solid var(--line);
     }
     .sidebar-note {
-      margin-top: 26px;
+      margin-top: auto;
       padding: 16px;
       border-radius: 18px;
       background: linear-gradient(135deg, #f6f0ff, #eff8ff);
@@ -361,13 +419,17 @@ function admin_storefront_label(string $storefront): string
       line-height: 1.6;
     }
     .content {
-      padding: 18px;
+      padding: clamp(14px, 1.8vw, 24px);
+      min-width: 0;
     }
     .topbar {
+      position: sticky;
+      top: 18px;
+      z-index: 35;
       display: flex;
       align-items: center;
       gap: 16px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 14px 16px;
@@ -408,6 +470,7 @@ function admin_storefront_label(string $storefront): string
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+      margin-left: auto;
     }
     .icon-pill {
       width: 40px;
@@ -433,29 +496,32 @@ function admin_storefront_label(string $storefront): string
     .page-shell {
       margin-top: 18px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
+      grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 380px);
       gap: 18px;
       align-items: start;
     }
     .main-panel,
-    .side-panel,
     .editor-card,
     .stats-card,
     .filters-card,
-    .section-head {
+    .orders-card,
+    .section-head,
+    .toolbar,
+    .storefront-section {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: 26px;
       box-shadow: var(--shadow);
     }
-    .main-panel { padding: 20px; }
+    .main-panel { padding: 22px; }
     .section-head {
-      padding: 16px 18px;
+      padding: 18px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 18px;
+      flex-wrap: wrap;
     }
     .breadcrumb {
       display: flex;
@@ -484,6 +550,7 @@ function admin_storefront_label(string $storefront): string
       justify-content: space-between;
       gap: 14px;
       margin-bottom: 18px;
+      padding: 14px 16px;
     }
     .toolbar-left,
     .toolbar-right {
@@ -509,7 +576,7 @@ function admin_storefront_label(string $storefront): string
       min-height: 44px;
       border-radius: 14px;
       border: 1px solid var(--line);
-      background: #f8faff;
+      background: #fff;
       padding: 0 14px;
       outline: none;
     }
@@ -517,7 +584,7 @@ function admin_storefront_label(string $storefront): string
     .product-grid {
       display: grid;
       gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
     .storefront-sections {
       display: grid;
@@ -525,10 +592,6 @@ function admin_storefront_label(string $storefront): string
     }
     .storefront-section {
       padding: 16px;
-      border-radius: 24px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.86);
-      box-shadow: var(--shadow);
     }
     .storefront-section-header {
       display: flex;
@@ -657,6 +720,7 @@ function admin_storefront_label(string $storefront): string
       display: flex;
       gap: 10px;
       margin-top: 14px;
+      flex-wrap: wrap;
     }
     .btn {
       border: 0;
@@ -685,11 +749,13 @@ function admin_storefront_label(string $storefront): string
       display: grid;
       gap: 18px;
       position: sticky;
-      top: 18px;
+      top: 98px;
+      align-self: start;
     }
     .stats-card,
     .filters-card,
-    .editor-card {
+    .editor-card,
+    .orders-card {
       padding: 18px;
     }
     .stats-grid {
@@ -712,6 +778,66 @@ function admin_storefront_label(string $storefront): string
     .stat span {
       color: var(--muted);
       font-size: 0.8rem;
+    }
+    .orders-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .order-entry {
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f8faff, #f2f6ff);
+      border: 1px solid var(--line);
+    }
+    .order-entry-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .order-entry-title {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .order-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .order-badge.status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .order-badge.status-processing {
+      background: #e0f2fe;
+      color: #075985;
+    }
+    .order-badge.status-paid {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .order-badge.status-cancelled {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .order-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
     }
     .panel-title {
       margin: 0 0 12px;
@@ -815,81 +941,199 @@ function admin_storefront_label(string $storefront): string
       color: var(--muted);
       font-size: 0.85rem;
     }
+    body {
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+    strong,
+    b {
+      font-weight: 500;
+    }
+    .brand,
+    .headline h1,
+    .panel-title,
+    .stat strong,
+    .storefront-section-count strong,
+    .product-name,
+    .order-entry-title,
+    .order-badge,
+    .btn,
+    .toolbar-chip,
+    .storefront-add-btn,
+    .side-link.active,
+    .side-item.active {
+      font-weight: 500;
+    }
+    .side-title,
+    .sidebar-note,
+    .headline p,
+    .breadcrumb,
+    .toolbar-left,
+    .toolbar-right,
+    .product-desc,
+    .product-meta,
+    .order-meta,
+    .filter-label,
+    .filter-pill,
+    .muted,
+    .small,
+    .status-line {
+      font-weight: 400;
+    }
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      backdrop-filter: blur(2px);
+      border: 0;
+      padding: 0;
+      margin: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 30;
+    }
     .mobile-only {
       display: none;
     }
     @media (max-width: 1180px) {
       .page-shell { grid-template-columns: 1fr; }
       .right-stack { position: static; }
+      .topbar { top: 14px; }
     }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar {
-        position: relative;
-        height: auto;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(88vw, 320px);
+        height: 100dvh;
+        transform: translateX(-105%);
+        transition: transform 220ms ease;
+        box-shadow: 32px 0 70px rgba(15, 23, 42, 0.18);
+        border-right: 1px solid var(--line);
+        padding: 16px;
+      }
+      body.sidebar-open .sidebar { transform: translateX(0); }
+      body.sidebar-open .sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
       }
       .content { padding: 14px; }
-      .topbar { flex-wrap: wrap; }
+      .topbar {
+        top: 14px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        padding: 12px 14px;
+      }
+      .searchbar {
+        order: 3;
+        width: 100%;
+        min-width: 0;
+      }
+      .top-icons {
+        margin-left: 0;
+      }
+      .sidebar-close { display: inline-grid; place-items: center; }
+      .side-group { padding: 12px; }
       .toolbar-input { min-width: 100%; }
+      .storefront-section-header,
+      .section-head,
+      .storefront-section-actions,
+      .editor-actions,
+      .toolbar {
+        align-items: stretch;
+      }
+      .toolbar-left,
+      .toolbar-right {
+        width: 100%;
+      }
+      .toolbar-right {
+        gap: 10px;
+      }
+      .toolbar-chip,
+      .toolbar-select,
+      .toolbar-input {
+        width: 100%;
+      }
     }
     @media (max-width: 640px) {
       .editor-grid { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: 1fr; }
       .mobile-only { display: inline-flex; }
       .desktop-only { display: none; }
+      .main-panel { padding: 16px; }
+      .section-head,
+      .toolbar,
+      .storefront-section,
+      .stats-card,
+      .filters-card,
+      .orders-card,
+      .editor-card {
+        border-radius: 22px;
+      }
+      .headline h1 { font-size: clamp(1.45rem, 6vw, 1.9rem); }
+      .breadcrumb {
+        font-size: 0.76rem;
+        flex-wrap: wrap;
+      }
+      .product-actions,
+      .order-entry-head {
+        flex-direction: column;
+      }
+      .order-badge {
+        align-self: flex-start;
+      }
+      .storefront-section-count {
+        min-width: 72px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">E</div>
-        <div>
-          <div style="font-size: 1rem;">EXTRA</div>
-          <div class="muted small" style="font-weight:600;">Store Admin</div>
-        </div>
-      </div>
-
-      <nav>
-        <div class="side-group">
-          <p class="side-title">Main</p>
-          <a class="side-link active" href="admin.php">Products</a>
-          <a class="side-link" href="index.html" target="_blank" rel="noreferrer">Storefront</a>
-          <a class="side-link" href="light-index.html" target="_blank" rel="noreferrer">Light Storefront</a>
-          <a class="side-link" href="iron-index.html" target="_blank" rel="noreferrer">Iron Storefront</a>
-          <a class="side-link" href="checkout.html" target="_blank" rel="noreferrer">Checkout</a>
-          <a class="side-link" href="light-checkout.html" target="_blank" rel="noreferrer">Light Checkout</a>
-          <a class="side-link" href="iron-checkout.html" target="_blank" rel="noreferrer">Iron Checkout</a>
-          <a class="side-link" href="light-cart.html" target="_blank" rel="noreferrer">Light Cart</a>
-          <a class="side-link" href="iron-cart.html" target="_blank" rel="noreferrer">Iron Cart</a>
-        </div>
-
-        <div class="side-group">
-          <p class="side-title">E-commerce</p>
-          <div class="side-item active">Products</div>
-          <div class="side-sublist">
-            <div class="side-item">Product Details</div>
-            <div class="side-item">Product List</div>
-            <div class="side-item">Checkout</div>
+    <button class="sidebar-backdrop" data-sidebar-overlay type="button" aria-label="Close sidebar" hidden></button>
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-shell">
+        <div class="sidebar-head">
+          <div class="brand">
+            <div class="brand-mark">E</div>
+            <div>
+              <div style="font-size: 1rem;">EXTRA</div>
+              <div class="muted small" style="font-weight:500;">Store Admin</div>
+            </div>
           </div>
+          <button class="sidebar-close mobile-only" type="button" aria-label="Close menu" data-sidebar-close>×</button>
         </div>
 
-        <div class="side-group">
-          <p class="side-title">Forms</p>
-          <div class="side-item">Components</div>
-          <div class="side-item">Plugins</div>
-        </div>
-      </nav>
+        <nav class="sidebar-nav">
+          <div class="side-group">
+            <p class="side-title">Main</p>
+            <a class="side-link active" href="admin.php">Products</a>
+          </div>
 
-      <div class="sidebar-note">
-        Use the form to create a new product or edit an existing one. Deleting a product removes it from the storefront too.
+          <div class="side-group">
+            <p class="side-title">Storefronts</p>
+            <a class="side-link" href="index.html" target="_blank" rel="noreferrer">Storefront</a>
+            <a class="side-link" href="light-index.html" target="_blank" rel="noreferrer">Light Storefront</a>
+            <a class="side-link" href="iron-index.html" target="_blank" rel="noreferrer">Iron Storefront</a>
+          </div>
+
+          <div class="side-group">
+            <p class="side-title">Purchases</p>
+            <a class="side-link" href="orders.php">Orders</a>
+          </div>
+        </nav>
+
+        <div class="sidebar-note">
+          New purchases appear in the orders page, so you can review them without leaving admin.
+        </div>
       </div>
     </aside>
 
     <main class="content">
       <div class="topbar">
-        <button class="hamburger mobile-only" type="button" aria-label="Menu">☰</button>
+        <button class="hamburger mobile-only" type="button" aria-label="Menu" data-sidebar-toggle>☰</button>
         <div class="searchbar">
           <span aria-hidden="true">⌕</span>
           <input id="globalSearch" type="text" placeholder="Search products, colors, categories">
@@ -931,7 +1175,7 @@ function admin_storefront_label(string $storefront): string
 
           <div class="toolbar">
             <div class="toolbar-left">
-              <div class="small muted" style="font-weight:700;">Shop</div>
+              <div class="small muted" style="font-weight:500;">Shop</div>
               <div class="small muted">&gt;</div>
             </div>
             <div class="toolbar-right">
@@ -1075,7 +1319,52 @@ function admin_storefront_label(string $storefront): string
                 <strong><?php echo (int) $ironStorefrontCount; ?></strong>
                 <span>Iron products</span>
               </div>
+              <div class="stat">
+                <strong><?php echo (int) $orderCount; ?></strong>
+                <span>Orders</span>
+              </div>
+              <div class="stat">
+                <strong><?php echo (int) $pendingOrderCount; ?></strong>
+                <span>Pending</span>
+              </div>
             </div>
+          </section>
+
+          <section class="orders-card" id="ordersCard">
+            <h2 class="panel-title">Checkout Orders</h2>
+            <p class="status-line" style="margin-top: 0;">
+              Every purchase saved in the database appears here and is emailed to `wagwulageorge@gmail.com`.
+            </p>
+
+            <?php if ($recentOrders): ?>
+              <div class="orders-list">
+                <?php foreach ($recentOrders as $order): ?>
+                  <?php
+                    $orderNumber = (string) ($order['order_number'] ?? '');
+                    $productName = (string) ($order['product_name'] ?? '');
+                    $customerName = (string) ($order['customer_name'] ?? '');
+                    $state = (string) ($order['state'] ?? '');
+                    $status = strtolower((string) ($order['status'] ?? 'pending'));
+                    $totalPrice = (int) ($order['total_price'] ?? 0);
+                    $createdAt = (string) ($order['created_at'] ?? '');
+                  ?>
+                  <article class="order-entry">
+                    <div class="order-entry-head">
+                      <p class="order-entry-title">#<?php echo admin_escape($orderNumber !== '' ? $orderNumber : '—'); ?> · <?php echo admin_escape($productName !== '' ? $productName : 'Unknown product'); ?></p>
+                      <span class="order-badge status-<?php echo admin_escape($status); ?>"><?php echo admin_escape($status); ?></span>
+                    </div>
+                    <div class="order-meta">
+                      <span><?php echo admin_escape($customerName !== '' ? $customerName : 'No customer name'); ?></span>
+                      <span><?php echo admin_escape($state !== '' ? $state : 'No state'); ?></span>
+                      <span><?php echo admin_escape('₦' . number_format($totalPrice)); ?></span>
+                      <span><?php echo admin_escape($createdAt !== '' ? $createdAt : 'No date'); ?></span>
+                    </div>
+                  </article>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <div class="storefront-empty" style="margin-top: 0;">No purchases have been placed yet.</div>
+            <?php endif; ?>
           </section>
 
           <section class="filters-card">
@@ -1173,7 +1462,7 @@ function admin_storefront_label(string $storefront): string
 
               <div class="editor-actions">
                 <div>
-                  <div id="editorMode" style="font-weight:700; color: var(--accent);">
+                  <div id="editorMode" style="font-weight:500; color: var(--accent);">
                     <?php echo $selectedProduct ? 'Editing ' . admin_escape((string) ($selectedProduct['id'] ?? 'product')) : 'Creating new product'; ?>
                   </div>
                   <div class="status-line">Save to update the storefront, checkout, and order emails.</div>
@@ -1217,10 +1506,36 @@ function admin_storefront_label(string $storefront): string
       const galleryUploadField = document.getElementById('productGalleryUpload');
       const descriptionField = document.getElementById('productDescription');
       const productCount = document.getElementById('productCount');
+      const sidebar = document.querySelector('[data-sidebar]');
+      const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
+      const sidebarClose = document.querySelector('[data-sidebar-close]');
+      const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
       let previewBlobUrl = '';
 
       function normalize(value) {
         return String(value || '').trim().toLowerCase();
+      }
+
+      function setSidebarOpen(open) {
+        document.body.classList.toggle('sidebar-open', open);
+        if (sidebarOverlay) {
+          sidebarOverlay.hidden = !open;
+        }
+        if (sidebar) {
+          if (window.innerWidth <= 900) {
+            sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
+          } else {
+            sidebar.removeAttribute('aria-hidden');
+          }
+        }
+      }
+
+      function openSidebar() {
+        setSidebarOpen(true);
+      }
+
+      function closeSidebar() {
+        setSidebarOpen(false);
       }
 
       function setPreviewSource(src) {
@@ -1350,6 +1665,30 @@ function admin_storefront_label(string $storefront): string
           productCount.textContent = String(totalVisible);
         }
       }
+
+      sidebarToggle?.addEventListener('click', openSidebar);
+      sidebarClose?.addEventListener('click', closeSidebar);
+      sidebarOverlay?.addEventListener('click', closeSidebar);
+
+      sidebar?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 900) {
+            closeSidebar();
+          }
+        });
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeSidebar();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+          closeSidebar();
+        }
+      });
 
       document.addEventListener('click', (event) => {
         const newProductForStorefront = event.target.closest('[data-new-product-for-storefront]');

@@ -32,6 +32,39 @@ function fail(string $message, int $statusCode, bool $wantsJson): void
     ], $statusCode, $wantsJson);
 }
 
+function extra_store_generate_order_number(PDO $pdo): string
+{
+    $check = $pdo->prepare('SELECT 1 FROM orders WHERE order_number = :order_number LIMIT 1');
+
+    for ($attempt = 0; $attempt < 12; $attempt++) {
+        $candidate = 'ES' . date('ymdHis') . random_int(1000, 9999);
+        $check->execute(['order_number' => $candidate]);
+        if (!$check->fetchColumn()) {
+            return $candidate;
+        }
+    }
+
+    return 'ES' . date('ymdHis') . random_int(100000, 999999);
+}
+
+function extra_store_table_columns(PDO $pdo, string $table): array
+{
+    static $cache = [];
+
+    if (isset($cache[$table])) {
+        return $cache[$table];
+    }
+
+    try {
+        $stmt = $pdo->query(sprintf('SHOW COLUMNS FROM `%s`', str_replace('`', '``', $table)));
+        $cache[$table] = $stmt ? array_map('strval', $stmt->fetchAll(PDO::FETCH_COLUMN, 0)) : [];
+    } catch (\Throwable $error) {
+        $cache[$table] = [];
+    }
+
+    return $cache[$table];
+}
+
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     fail('Method not allowed.', 405, $wantsJson);
 }
@@ -47,13 +80,11 @@ $productId = trim((string) ($_POST['product'] ?? ''));
 $qty = (int) ($_POST['qty'] ?? 1);
 $qty = max(1, min(99, $qty));
 $fullName = trim((string) ($_POST['full_name'] ?? ($_POST['customer_name'] ?? '')));
+$phone = trim((string) ($_POST['phone'] ?? ''));
 $address = trim((string) ($_POST['address'] ?? ''));
 $state = trim((string) ($_POST['state'] ?? ''));
 $orderNote = trim((string) ($_POST['order_note'] ?? ''));
-$orderNumber = preg_replace('/\D+/', '', (string) ($_POST['order_number'] ?? ''));
-$orderNumber = $orderNumber !== '' ? $orderNumber : (string) random_int(100000, 999999);
-
-if ($fullName === '' || $address === '' || $state === '') {
+if ($fullName === '' || $phone === '' || $address === '' || $state === '') {
     fail('Please complete all required fields.', 422, $wantsJson);
 }
 
@@ -82,57 +113,14 @@ $productCategory = $product['category'];
 $productImage = $product['image_primary'] ?: ($product['images'][0] ?? '');
 $productDescription = $product['description'];
 $adminEmail = extra_store_admin_email();
+$mailerConfig = extra_store_mailer_config();
+$orderNumber = extra_store_generate_order_number($pdo);
+$orderColumns = array_fill_keys(extra_store_table_columns($pdo, 'orders'), true);
 
 try {
     $pdo->beginTransaction();
 
-    $insert = $pdo->prepare(
-        'INSERT INTO orders (
-            order_number,
-            product_id,
-            product_name,
-            product_image,
-            product_description,
-            product_category,
-            qty,
-            unit_price,
-            total_price,
-            customer_name,
-            first_name,
-            last_name,
-            email,
-            address,
-            city,
-            state,
-            order_note,
-            receipt_original_name,
-            receipt_path,
-            status
-        ) VALUES (
-            :order_number,
-            :product_id,
-            :product_name,
-            :product_image,
-            :product_description,
-            :product_category,
-            :qty,
-            :unit_price,
-            :total_price,
-            :customer_name,
-            :first_name,
-            :last_name,
-            :email,
-            :address,
-            :city,
-            :state,
-            :order_note,
-            :receipt_original_name,
-            :receipt_path,
-            :status
-        )'
-    );
-
-    $insert->execute([
+    $orderData = [
         'order_number' => $orderNumber,
         'product_id' => $productId,
         'product_name' => $productName,
@@ -146,6 +134,7 @@ try {
         'first_name' => $firstName,
         'last_name' => $lastName,
         'email' => $email,
+        'phone' => $phone,
         'address' => $address,
         'city' => '',
         'state' => $state,
@@ -153,7 +142,30 @@ try {
         'receipt_original_name' => '',
         'receipt_path' => '',
         'status' => 'pending'
-    ]);
+    ];
+
+    $insertColumns = [];
+    $insertPlaceholders = [];
+    $insertValues = [];
+    foreach ($orderData as $column => $value) {
+        if (!isset($orderColumns[$column])) {
+            continue;
+        }
+
+        $insertColumns[] = $column;
+        $insertPlaceholders[] = ':' . $column;
+        $insertValues[$column] = $value;
+    }
+
+    if (!$insertColumns) {
+        fail('We could not save your order because the orders table is not available.', 500, $wantsJson);
+    }
+
+    $insert = $pdo->prepare(
+        'INSERT INTO orders (' . implode(', ', $insertColumns) . ') VALUES (' . implode(', ', $insertPlaceholders) . ')'
+    );
+
+    $insert->execute($insertValues);
 
     $pdo->commit();
 } catch (\Throwable $error) {
@@ -161,7 +173,9 @@ try {
         $pdo->rollBack();
     }
 
-    fail('We could not save your order in the database. Please try again.', 500, $wantsJson);
+    $databaseError = $error->getMessage();
+    error_log('Extra Store order save failed: ' . $databaseError);
+    fail('We could not save your order in the database. Please try again. ' . $databaseError, 500, $wantsJson);
 }
 
 $recipientEmail = $adminEmail;
@@ -175,8 +189,22 @@ if ($mailerAvailable) {
 
     try {
         $mail->CharSet = 'UTF-8';
-        $mail->isMail();
-        $mail->setFrom('hello@extrastore.com', 'Extra Store');
+        if (($mailerConfig['transport'] ?? 'mail') === 'smtp' && !empty($mailerConfig['host'])) {
+            $mail->isSMTP();
+            $mail->Host = (string) $mailerConfig['host'];
+            $mail->Port = (int) $mailerConfig['port'];
+            $mail->SMTPAuth = (string) ($mailerConfig['username'] ?? '') !== '';
+            $mail->Username = (string) ($mailerConfig['username'] ?? '');
+            $mail->Password = (string) ($mailerConfig['password'] ?? '');
+            $encryption = (string) ($mailerConfig['encryption'] ?? '');
+            if ($encryption !== '') {
+                $mail->SMTPSecure = $encryption;
+            }
+        } else {
+            $mail->isMail();
+        }
+
+        $mail->setFrom((string) $mailerConfig['from_email'], (string) $mailerConfig['from_name']);
         $mail->addAddress($recipientEmail, 'Extra Store Admin');
 
         $mail->isHTML(true);
@@ -199,6 +227,7 @@ if ($mailerAvailable) {
                 <tr><td style="padding:6px 0;color:#8c7a66;">Unit price</td><td style="padding:6px 0;">₦' . number_format($productPrice) . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Total</td><td style="padding:6px 0;font-weight:700;">₦' . number_format($productTotal) . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Customer name</td><td style="padding:6px 0;">' . htmlspecialchars($customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName), ENT_QUOTES, 'UTF-8') . '</td></tr>
+                <tr><td style="padding:6px 0;color:#8c7a66;">Phone</td><td style="padding:6px 0;">' . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Address</td><td style="padding:6px 0;">' . htmlspecialchars($address, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">State</td><td style="padding:6px 0;">' . htmlspecialchars($state, ENT_QUOTES, 'UTF-8') . '</td></tr>
                 <tr><td style="padding:6px 0;color:#8c7a66;">Note</td><td style="padding:6px 0;">' . htmlspecialchars($orderNote !== '' ? $orderNote : 'No note provided.', ENT_QUOTES, 'UTF-8') . '</td></tr>
@@ -220,6 +249,7 @@ if ($mailerAvailable) {
             'Unit price: ₦' . number_format($productPrice),
             'Total: ₦' . number_format($productTotal),
             'Customer name: ' . ($customerName !== '' ? $customerName : trim($firstName . ' ' . $lastName)),
+            'Phone: ' . $phone,
             'Address: ' . $address,
             'State: ' . $state,
             'Note: ' . ($orderNote !== '' ? $orderNote : 'No note provided.')
