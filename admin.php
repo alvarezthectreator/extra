@@ -88,6 +88,17 @@ function admin_store_uploaded_image(array $file, string $prefix = 'product'): st
     return 'uploads/products/' . $storedName;
 }
 
+function admin_input_value($value): string
+{
+    return admin_escape((string) $value);
+}
+
+function admin_storefront_label(string $storefront): string
+{
+    $storefront = extra_store_normalize_storefront($storefront);
+    return $storefront === 'light' ? 'Light Store' : ($storefront === 'iron' ? 'Iron Store' : 'Extra Store');
+}
+
 try {
     $pdo = extra_store_pdo();
     extra_store_bootstrap_catalog($pdo);
@@ -226,6 +237,8 @@ try {
     $recentOrders = [];
 }
 
+$recentOrders = array_slice($recentOrders, 0, 8);
+
 $editorValues = $selectedProduct ?? [
     'id' => '',
     'name' => '',
@@ -248,23 +261,26 @@ $editorStorefront = extra_store_normalize_storefront((string) ($editorValues['st
 $extraStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'extra'));
 $lightStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'light'));
 $ironStorefrontCount = count(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === 'iron'));
+$productAveragePrice = $products ? (int) round($totalValue / max(1, count($products))) : 0;
 
-function admin_input_value($value): string
-{
-    return admin_escape((string) $value);
+$categoryCounts = [];
+foreach ($products as $product) {
+    $category = trim((string) ($product['category'] ?? ''));
+    if ($category === '') {
+        $category = 'Uncategorized';
+    }
+    $categoryCounts[$category] = ($categoryCounts[$category] ?? 0) + 1;
 }
+arsort($categoryCounts);
+$topCategories = array_slice($categoryCounts, 0, 4, true);
 
-function admin_storefront_label(string $storefront): string
-{
-    $storefront = extra_store_normalize_storefront($storefront);
-    if ($storefront === 'light') {
-        return 'Lamp Store';
-    }
-    if ($storefront === 'iron') {
-        return 'Iron Store';
-    }
-    return 'Umbrella Store';
-}
+$storefrontCounts = [
+    'extra' => $extraStorefrontCount,
+    'light' => $lightStorefrontCount,
+    'iron' => $ironStorefrontCount,
+];
+$maxStorefrontCount = max(1, max($storefrontCounts));
+$maxCategoryCount = max(1, max($categoryCounts ?: [1]));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -274,878 +290,89 @@ function admin_storefront_label(string $storefront): string
   <title>Extra Store Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #eff3fb;
-      --panel: #ffffff;
-      --panel-soft: #f7f9fd;
-      --line: #dfe7f3;
-      --ink: #1f2a37;
-      --muted: #6b7280;
-      --accent: #6b4eff;
-      --accent-soft: #ece7ff;
-      --accent-2: #38bdf8;
-      --danger: #ef4444;
-      --success: #16a34a;
-      --shadow: 0 18px 45px rgba(29, 41, 57, 0.08);
-      --sidebar-width: 292px;
-    }
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; }
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(107, 78, 255, 0.08), transparent 28%),
-        linear-gradient(180deg, #f9fbff 0%, #eef3fb 100%);
-      color: var(--ink);
-    }
-    a { color: inherit; }
-    button, input, textarea, select { font: inherit; }
-    .layout {
-      display: grid;
-      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-      min-height: 100vh;
-      position: relative;
-    }
-    .sidebar {
-      position: sticky;
-      top: 0;
-      align-self: start;
-      height: 100vh;
-      padding: 18px;
-      background:
-        radial-gradient(circle at top right, rgba(107, 78, 255, 0.06), transparent 30%),
-        rgba(255, 255, 255, 0.94);
-      border-right: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-      overflow: auto;
-      z-index: 40;
-    }
-    .sidebar-shell {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .sidebar-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .sidebar-close {
-      display: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      font-size: 1.2rem;
-      font-weight: 700;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-    }
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #d9d1ff, #bde6ff);
-      display: grid;
-      place-items: center;
-      color: var(--accent);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
-    }
-    .side-group {
-      padding: 14px;
-      border-radius: 20px;
-      border: 1px solid var(--line);
-      background: rgba(248, 250, 255, 0.92);
-    }
-    .side-group + .side-group { margin-top: 0; }
-    .side-title {
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin: 0 0 10px;
-    }
-    .side-link,
-    .side-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      color: #334155;
-      text-decoration: none;
-      margin-bottom: 8px;
-      transition: background 120ms ease, transform 120ms ease, color 120ms ease;
-    }
-    .side-link:hover,
-    .side-item:hover {
-      background: #f2f6ff;
-      transform: translateX(1px);
-    }
-    .side-link.active,
-    .side-item.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .side-sublist {
-      margin: 8px 0 0 18px;
-      padding-left: 14px;
-      border-left: 1px solid var(--line);
-    }
-    .sidebar-note {
-      margin-top: auto;
-      padding: 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #f6f0ff, #eff8ff);
-      border: 1px solid #e6e8ff;
-      color: #4c1d95;
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-    .content {
-      padding: clamp(14px, 1.8vw, 24px);
-      min-width: 0;
-    }
-    .topbar {
-      position: sticky;
-      top: 18px;
-      z-index: 35;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 14px 16px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-    .hamburger {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--accent-soft);
-      color: var(--accent);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-    }
-    .searchbar {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px;
-      min-height: 44px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: #f8faff;
-    }
-    .searchbar input {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--ink);
-    }
-    .top-icons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-left: auto;
-    }
-    .icon-pill {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: #f8faff;
-      display: grid;
-      place-items: center;
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #ffd39a, #fff4d8);
-      display: grid;
-      place-items: center;
-      color: #9f580a;
-      font-weight: 800;
-    }
-    .page-shell {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 380px);
-      gap: 18px;
-      align-items: start;
-    }
-    .main-panel,
-    .editor-card,
-    .stats-card,
-    .filters-card,
-    .orders-card,
-    .section-head,
-    .toolbar,
-    .storefront-section {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid var(--line);
-      border-radius: 26px;
-      box-shadow: var(--shadow);
-    }
-    .main-panel { padding: 22px; }
-    .section-head {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-    }
-    .breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    .breadcrumbs strong {
-      color: var(--accent);
-    }
-    .headline h1 {
-      margin: 0;
-      font-size: clamp(1.7rem, 2vw, 2.2rem);
-      line-height: 1.1;
-    }
-    .headline p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 18px;
-      padding: 14px 16px;
-    }
-    .toolbar-left,
-    .toolbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .toolbar-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: #f6f7ff;
-      border: 1px solid var(--line);
-      color: #4338ca;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .toolbar-select,
-    .toolbar-input {
-      min-height: 44px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: #fff;
-      padding: 0 14px;
-      outline: none;
-    }
-    .toolbar-input { min-width: 220px; }
-    .product-grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-    .storefront-sections {
-      display: grid;
-      gap: 18px;
-    }
-    .storefront-section {
-      padding: 16px;
-    }
-    .storefront-section-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .storefront-section-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .storefront-section-header p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    .storefront-section-count {
-      min-width: 84px;
-      text-align: right;
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, #f8faff, #f2f6ff);
-      border: 1px solid var(--line);
-    }
-    .storefront-section-count strong {
-      display: block;
-      font-size: 1.1rem;
-    }
-    .storefront-section-count span {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-    .storefront-add-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(107, 78, 255, 0.18);
-      background: linear-gradient(180deg, #ffffff, #f4f1ff);
-      color: #4338ca;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 22px rgba(107, 78, 255, 0.08);
-      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
-    }
-    .storefront-add-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 14px 28px rgba(107, 78, 255, 0.12);
-      background: linear-gradient(180deg, #ffffff, #ece7ff);
-    }
-    .product-card {
-      overflow: hidden;
-      border-radius: 22px;
-      border: 1px solid var(--line);
-      background: #fff;
-      box-shadow: 0 16px 38px rgba(31, 42, 55, 0.07);
-    }
-    .product-card.highlight {
-      border-color: rgba(107, 78, 255, 0.35);
-      box-shadow: 0 18px 44px rgba(107, 78, 255, 0.12);
-    }
-    .product-thumb {
-      aspect-ratio: 1 / 1;
-      width: 100%;
-      object-fit: cover;
-      display: block;
-      background: #eef2ff;
-    }
-    .product-body {
-      padding: 14px 14px 16px;
-    }
-    .product-name {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      line-height: 1.35;
-    }
-    .product-desc {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.6;
-      min-height: 3.2em;
-    }
-    .product-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 12px 0 0;
-      color: #475569;
-      font-size: 0.85rem;
-    }
-    .storefront-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: #eef2ff;
-      color: #4338ca;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-    .product-id-line {
-      color: #64748b;
-      font-size: 0.8rem;
-      word-break: break-word;
-    }
-    .storefront-empty {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px dashed var(--line);
-      background: #f8faff;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    .product-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-    .btn {
-      border: 0;
-      border-radius: 14px;
-      min-height: 42px;
-      padding: 0 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-      box-shadow: 0 10px 24px rgba(107, 78, 255, 0.22);
-    }
-    .btn-soft {
-      background: #eef2ff;
-      color: #4338ca;
-    }
-    .btn-danger {
-      background: #fff1f2;
-      color: var(--danger);
-    }
-    .right-stack {
-      display: grid;
-      gap: 18px;
-      position: sticky;
-      top: 98px;
-      align-self: start;
-    }
-    .stats-card,
-    .filters-card,
-    .editor-card,
-    .orders-card {
-      padding: 18px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .stat {
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #f8faff, #f2f6ff);
-      border: 1px solid var(--line);
-    }
-    .stat strong {
-      display: block;
-      font-size: 1.15rem;
-      margin-bottom: 4px;
-    }
-    .stat span {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-    .orders-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .order-entry {
-      padding: 14px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, #f8faff, #f2f6ff);
-      border: 1px solid var(--line);
-    }
-    .order-entry-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .order-entry-title {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.4;
-    }
-    .order-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .order-badge.status-pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .order-badge.status-processing {
-      background: #e0f2fe;
-      color: #075985;
-    }
-    .order-badge.status-paid {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .order-badge.status-cancelled {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .order-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 14px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.5;
-    }
-    .panel-title {
-      margin: 0 0 12px;
-      font-size: 1rem;
-    }
-    .filter-group {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-    }
-    .filter-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-    .filter-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .filter-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: #f8faff;
-      color: #334155;
-      font-size: 0.9rem;
-    }
-    .editor-card form { display: grid; gap: 14px; }
-    .editor-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .field {
-      display: grid;
-      gap: 7px;
-    }
-    .field.full { grid-column: 1 / -1; }
-    label {
-      color: #475569;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-    input[type="text"],
-    input[type="number"],
-    textarea,
-    select {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 12px 14px;
-      background: #f9fbff;
-      color: var(--ink);
-      outline: none;
-    }
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-    .editor-preview {
-      width: 100%;
-      height: 180px;
-      border-radius: 18px;
-      object-fit: cover;
-      border: 1px solid var(--line);
-      background: #eef2ff;
-      margin-bottom: 12px;
-    }
-    .editor-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      margin-top: 4px;
-    }
-    .flash {
-      margin-bottom: 14px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: #fff;
-      box-shadow: var(--shadow);
-    }
-    .flash.success { border-color: rgba(22, 163, 74, 0.2); background: #f0fdf4; color: #166534; }
-    .flash.error { border-color: rgba(239, 68, 68, 0.2); background: #fef2f2; color: #b91c1c; }
-    .muted { color: var(--muted); }
-    .small { font-size: 0.85rem; }
-    .status-line {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    body {
-      font-weight: 400;
-      letter-spacing: 0.01em;
-    }
-    strong,
-    b {
-      font-weight: 500;
-    }
-    .brand,
-    .headline h1,
-    .panel-title,
-    .stat strong,
-    .storefront-section-count strong,
-    .product-name,
-    .order-entry-title,
-    .order-badge,
-    .btn,
-    .toolbar-chip,
-    .storefront-add-btn,
-    .side-link.active,
-    .side-item.active {
-      font-weight: 500;
-    }
-    .side-title,
-    .sidebar-note,
-    .headline p,
-    .breadcrumb,
-    .toolbar-left,
-    .toolbar-right,
-    .product-desc,
-    .product-meta,
-    .order-meta,
-    .filter-label,
-    .filter-pill,
-    .muted,
-    .small,
-    .status-line {
-      font-weight: 400;
-    }
-    .sidebar-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.42);
-      backdrop-filter: blur(2px);
-      border: 0;
-      padding: 0;
-      margin: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 180ms ease;
-      z-index: 30;
-    }
-    .mobile-only {
-      display: none;
-    }
-    @media (max-width: 1180px) {
-      .page-shell { grid-template-columns: 1fr; }
-      .right-stack { position: static; }
-      .topbar { top: 14px; }
-    }
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar {
-        position: fixed;
-        inset: 0 auto 0 0;
-        width: min(88vw, 320px);
-        height: 100dvh;
-        transform: translateX(-105%);
-        transition: transform 220ms ease;
-        box-shadow: 32px 0 70px rgba(15, 23, 42, 0.18);
-        border-right: 1px solid var(--line);
-        padding: 16px;
-      }
-      body.sidebar-open .sidebar { transform: translateX(0); }
-      body.sidebar-open .sidebar-backdrop {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .content { padding: 14px; }
-      .topbar {
-        top: 14px;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        padding: 12px 14px;
-      }
-      .searchbar {
-        order: 3;
-        width: 100%;
-        min-width: 0;
-      }
-      .top-icons {
-        margin-left: 0;
-      }
-      .sidebar-close { display: inline-grid; place-items: center; }
-      .side-group { padding: 12px; }
-      .toolbar-input { min-width: 100%; }
-      .storefront-section-header,
-      .section-head,
-      .storefront-section-actions,
-      .editor-actions,
-      .toolbar {
-        align-items: stretch;
-      }
-      .toolbar-left,
-      .toolbar-right {
-        width: 100%;
-      }
-      .toolbar-right {
-        gap: 10px;
-      }
-      .toolbar-chip,
-      .toolbar-select,
-      .toolbar-input {
-        width: 100%;
-      }
-    }
-    @media (max-width: 640px) {
-      .editor-grid { grid-template-columns: 1fr; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .mobile-only { display: inline-flex; }
-      .desktop-only { display: none; }
-      .main-panel { padding: 16px; }
-      .section-head,
-      .toolbar,
-      .storefront-section,
-      .stats-card,
-      .filters-card,
-      .orders-card,
-      .editor-card {
-        border-radius: 22px;
-      }
-      .headline h1 { font-size: clamp(1.45rem, 6vw, 1.9rem); }
-      .breadcrumb {
-        font-size: 0.76rem;
-        flex-wrap: wrap;
-      }
-      .product-actions,
-      .order-entry-head {
-        flex-direction: column;
-      }
-      .order-badge {
-        align-self: flex-start;
-      }
-      .storefront-section-count {
-        min-width: 72px;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body>
-  <div class="layout">
-    <button class="sidebar-backdrop" data-sidebar-overlay type="button" aria-label="Close sidebar" hidden></button>
-    <aside class="sidebar" data-sidebar>
-      <div class="sidebar-shell">
-        <div class="sidebar-head">
-          <div class="brand">
-            <div class="brand-mark">E</div>
-            <div>
-              <div style="font-size: 1rem;">EXTRA</div>
-              <div class="muted small" style="font-weight:500;">Store Admin</div>
-            </div>
-          </div>
-          <button class="sidebar-close mobile-only" type="button" aria-label="Close menu" data-sidebar-close>×</button>
-        </div>
+<body class="admin-page">
+  <div class="admin-shell">
+    <button class="admin-backdrop" type="button" data-admin-backdrop hidden aria-label="Close sidebar"></button>
 
+    <aside class="admin-sidebar" data-admin-sidebar aria-hidden="true">
+      <div class="sidebar-brand">
+        <div class="brand-lockup">
+          <div class="brand-mark">E</div>
+          <div>
+            <div class="brand-title">Extra Admin</div>
+            <div class="brand-subtitle">Catalog and orders</div>
+          </div>
+        </div>
+        <button class="sidebar-toggle" type="button" data-admin-sidebar-close aria-label="Close menu">×</button>
+      </div>
+
+      <div class="sidebar-stats">
+        <div class="sidebar-stat">
+          <strong><?php echo (int) count($products); ?></strong>
+          <span>Products</span>
+        </div>
+        <div class="sidebar-stat">
+          <strong><?php echo (int) $orderCount; ?></strong>
+          <span>Orders</span>
+        </div>
+        <div class="sidebar-stat">
+          <strong><?php echo (int) $pendingOrderCount; ?></strong>
+          <span>Pending</span>
+        </div>
+      </div>
+
+      <div class="sidebar-group">
+        <p class="sidebar-group-title">Dashboard</p>
         <nav class="sidebar-nav">
-          <div class="side-group">
-            <p class="side-title">Main</p>
-            <a class="side-link active" href="admin.php">Products</a>
-          </div>
-
-          <div class="side-group">
-            <p class="side-title">Storefronts</p>
-            <a class="side-link" href="index.html" target="_blank" rel="noreferrer">Storefront</a>
-            <a class="side-link" href="light-index.html" target="_blank" rel="noreferrer">Light Storefront</a>
-            <a class="side-link" href="iron-index.html" target="_blank" rel="noreferrer">Iron Storefront</a>
-          </div>
-
-          <div class="side-group">
-            <p class="side-title">Purchases</p>
-            <a class="side-link" href="orders.php">Orders</a>
-          </div>
+          <a href="#overview" data-admin-nav-link class="active">Overview</a>
+          <a href="#products" data-admin-nav-link>Products</a>
+          <a href="#orders" data-admin-nav-link>Orders</a>
+          <a href="#editor" data-admin-nav-link>Editor</a>
         </nav>
+      </div>
 
-        <div class="sidebar-note">
-          New purchases appear in the orders page, so you can review them without leaving admin.
+      <div class="sidebar-group">
+        <p class="sidebar-group-title">Storefronts</p>
+        <div class="sidebar-links">
+          <a href="index.html" target="_blank" rel="noreferrer">Extra Store <span>↗</span></a>
+          <a href="light-index.html" target="_blank" rel="noreferrer">Light Store <span>↗</span></a>
+          <a href="iron-index.html" target="_blank" rel="noreferrer">Iron Store <span>↗</span></a>
         </div>
+      </div>
+
+      <div class="sidebar-group">
+        <p class="sidebar-group-title">Quick Actions</p>
+        <div class="sidebar-links">
+          <a href="#editor" data-new-product data-storefront="<?php echo admin_escape($editorStorefront); ?>">New product <span>+</span></a>
+          <a href="orders.php">Open orders page <span>↗</span></a>
+        </div>
+      </div>
+
+      <div class="sidebar-note">
+        Product updates sync to the storefronts and checkout flow. Orders stay in the admin workspace so you can manage everything in one place.
       </div>
     </aside>
 
-    <main class="content">
-      <div class="topbar">
-        <button class="hamburger mobile-only" type="button" aria-label="Menu" data-sidebar-toggle>☰</button>
-        <div class="searchbar">
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" type="button" data-admin-sidebar-toggle aria-expanded="false" aria-label="Open menu">☰</button>
+        <div class="topbar-search">
           <span aria-hidden="true">⌕</span>
-          <input id="globalSearch" type="text" placeholder="Search products, colors, categories">
+          <input type="search" placeholder="Search products, categories, colors" data-admin-search>
         </div>
-        <div class="top-icons">
-          <div class="icon-pill" aria-hidden="true">◔</div>
-          <div class="icon-pill" aria-hidden="true">A</div>
-          <div class="icon-pill" aria-hidden="true">!</div>
-          <div class="avatar" aria-label="Admin">EX</div>
-          <div class="icon-pill" aria-hidden="true">⚙</div>
+        <div class="topbar-actions">
+          <div class="topbar-icon" aria-hidden="true">◔</div>
+          <div class="topbar-icon" aria-hidden="true">⌁</div>
+          <div class="profile-chip">
+            <div class="profile-avatar" aria-hidden="true">EX</div>
+            <div class="profile-name">Store Admin</div>
+            <div class="profile-caret" aria-hidden="true">⌄</div>
+          </div>
         </div>
-      </div>
+      </header>
 
       <?php if ($status === 'created'): ?>
         <div class="flash success">Created product <strong><?php echo admin_escape($message !== '' ? $message : ''); ?></strong>.</div>
@@ -1157,72 +384,201 @@ function admin_storefront_label(string $storefront): string
         <div class="flash error"><?php echo admin_escape($message !== '' ? $message : 'Something went wrong.'); ?></div>
       <?php endif; ?>
 
-      <div class="page-shell">
-        <section class="main-panel">
-          <div class="section-head">
-            <div class="headline">
-              <h1>Products</h1>
-              <p>Manage product records, images, and storefront details from one place.</p>
+      <section class="admin-banner" id="overview">
+        <div class="banner-copy">
+          <h1>Products Dashboard</h1>
+          <p>Manage product records, storefront placement, gallery images, and incoming orders from one polished workspace. The layout is built to feel closer to a modern SaaS admin while keeping the same functional backend.</p>
+        </div>
+        <div class="banner-actions">
+          <button type="button" class="btn btn-primary" data-new-product data-storefront="<?php echo admin_escape($editorStorefront); ?>">+ Add Product</button>
+          <a class="btn btn-ghost" href="#orders">View Orders</a>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Dashboard summary">
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Catalog size</span>
+            <span class="metric-chip primary">Live</span>
+          </div>
+          <div class="metric-value"><?php echo (int) count($products); ?></div>
+          <div class="metric-note">Products currently in the database</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Orders</span>
+            <span class="metric-chip success">Incoming</span>
+          </div>
+          <div class="metric-value"><?php echo (int) $orderCount; ?></div>
+          <div class="metric-note"><?php echo (int) $pendingOrderCount; ?> pending for review</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Total value</span>
+            <span class="metric-chip warning">Inventory</span>
+          </div>
+          <div class="metric-value"><?php echo admin_escape('₦' . number_format($totalValue)); ?></div>
+          <div class="metric-note">Combined price of every product</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Average price</span>
+            <span class="metric-chip danger">Catalog</span>
+          </div>
+          <div class="metric-value"><?php echo admin_escape('₦' . number_format($productAveragePrice)); ?></div>
+          <div class="metric-note">Based on the current product mix</div>
+        </article>
+      </section>
+
+      <section class="insight-grid" aria-label="Catalog insights">
+        <article class="panel chart-card">
+          <div class="chart-card-head">
+            <div>
+              <h2 class="panel-title">Storefront mix</h2>
+              <div class="panel-subtitle">How products are split across the three storefronts</div>
             </div>
-            <div class="breadcrumb">
-              <span>Home</span>
-              <span>&gt;</span>
-              <strong>E-commerce</strong>
-              <span>&gt;</span>
-              <span>Products</span>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot primary"></span> Extra</span>
+              <span class="legend-item"><span class="legend-dot accent"></span> Light</span>
+              <span class="legend-item"><span class="legend-dot success"></span> Iron</span>
             </div>
           </div>
-
-          <div class="toolbar">
-            <div class="toolbar-left">
-              <div class="small muted" style="font-weight:500;">Shop</div>
-              <div class="small muted">&gt;</div>
-            </div>
-            <div class="toolbar-right">
-              <input id="productSearch" class="toolbar-input" type="text" placeholder="Search product">
-              <select id="productSort" class="toolbar-select">
-                <option value="featured">Sort by featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="name">Name: A to Z</option>
-              </select>
-              <button id="clearFilters" type="button" class="toolbar-chip">Clear filters</button>
-            </div>
-          </div>
-
-          <div class="storefront-sections" id="productGrid">
-          <?php foreach ([
-              'extra' => ['label' => 'Umbrella Store', 'description' => 'All umbrella products from the main store.'],
-              'light' => ['label' => 'Lamp Store', 'description' => 'All lamp products from the light store.'],
-              'iron' => ['label' => 'Iron Store', 'description' => 'All iron products from the iron store.'],
-            ] as $storefrontKey => $storefrontMeta): ?>
+          <div class="chart-stack">
+            <?php foreach ($storefrontCounts as $storefrontKey => $count): ?>
               <?php
-                $storefrontProducts = array_values(array_filter($products, static fn ($product) => extra_store_normalize_storefront((string) ($product['storefront'] ?? '')) === $storefrontKey));
+                $label = admin_storefront_label($storefrontKey);
+                $width = (int) round(($count / $maxStorefrontCount) * 100);
+                $chipClass = $storefrontKey === 'extra' ? 'primary' : ($storefrontKey === 'light' ? 'warning' : 'success');
               ?>
-              <section class="storefront-section" data-storefront-section data-storefront="<?php echo admin_escape($storefrontKey); ?>">
-                <div class="storefront-section-header">
-                  <div>
-                    <h2 class="panel-title" style="margin-bottom: 4px;"><?php echo admin_escape($storefrontMeta['label']); ?></h2>
-                    <p><?php echo admin_escape($storefrontMeta['description']); ?></p>
+              <div class="chart-row">
+                <div class="chart-row-label">
+                  <span><?php echo admin_escape($label); ?></span>
+                  <strong><?php echo (int) $count; ?></strong>
+                </div>
+                <div class="chart-track">
+                  <span class="chart-fill <?php echo admin_escape($chipClass); ?>" style="width: <?php echo (int) $width; ?>%;"></span>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </article>
+
+        <article class="panel chart-card">
+          <div class="chart-card-head">
+            <div>
+              <h2 class="panel-title">Category reach</h2>
+              <div class="panel-subtitle">Your most active product categories right now</div>
+            </div>
+            <span class="metric-chip primary"><?php echo count($categoryCounts); ?> categories</span>
+          </div>
+          <div class="chart-stack">
+            <?php if ($topCategories): ?>
+              <?php foreach ($topCategories as $category => $count): ?>
+                <?php $width = (int) round(($count / $maxCategoryCount) * 100); ?>
+                <div class="chart-row">
+                  <div class="chart-row-label">
+                    <span><?php echo admin_escape($category); ?></span>
+                    <strong><?php echo (int) $count; ?></strong>
                   </div>
-                  <div class="storefront-section-actions">
-                    <button
-                      type="button"
-                      class="storefront-add-btn"
-                      data-new-product-for-storefront
-                      data-storefront="<?php echo admin_escape($storefrontKey); ?>"
-                    >
-                      + Add Product
-                    </button>
-                    <div class="storefront-section-count">
-                      <strong data-storefront-count><?php echo count($storefrontProducts); ?></strong>
-                      <span>products</span>
-                    </div>
+                  <div class="chart-track">
+                    <span class="chart-fill" style="width: <?php echo (int) $width; ?>%;"></span>
                   </div>
                 </div>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <div class="help-text">No categories found yet.</div>
+            <?php endif; ?>
+          </div>
+        </article>
+      </section>
 
-                <div class="product-grid" data-storefront-grid>
-                  <?php foreach ($storefrontProducts as $index => $product): ?>
+      <div class="content-grid">
+        <section class="content-column">
+          <section class="panel" id="products">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Products</h2>
+                <div class="panel-subtitle">Filter, sort, edit, and remove products from one table</div>
+              </div>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot primary"></span> <?php echo (int) count($products); ?> total</span>
+                <span class="legend-item"><span class="legend-dot success"></span> <span data-product-visible-count><?php echo (int) count($products); ?></span> visible</span>
+              </div>
+            </div>
+
+            <div class="catalog-toolbar">
+              <div class="catalog-toolbar-left">
+                <button type="button" class="catalog-toggle" aria-label="Table view">☰</button>
+                <button type="button" class="catalog-toggle" aria-label="Grid view">▦</button>
+              </div>
+              <div class="catalog-toolbar-right">
+                <input type="search" class="catalog-input" placeholder="Search products..." data-admin-search>
+                <select class="catalog-select" data-admin-filter="sort">
+                  <option value="featured">Sort: Featured</option>
+                  <option value="recent">Sort: Recent</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name">Name: A to Z</option>
+                </select>
+                <button type="button" class="btn btn-ghost" data-admin-clear-filters>Clear filters</button>
+                <button type="button" class="btn btn-primary" data-new-product data-storefront="<?php echo admin_escape($editorStorefront); ?>">+ Add Product</button>
+              </div>
+            </div>
+
+            <div class="catalog-tools" id="filters">
+              <div class="filter-field">
+                <label for="catalogCategoryFilter">Category</label>
+                <select id="catalogCategoryFilter" data-admin-filter="category">
+                  <option value="all">All categories</option>
+                  <?php foreach ($allCategories as $category): ?>
+                    <option value="<?php echo admin_escape($category); ?>"><?php echo admin_escape($category); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="filter-field">
+                <label for="catalogStoreFilter">Store</label>
+                <select id="catalogStoreFilter" data-admin-filter="store">
+                  <option value="all">All stores</option>
+                  <option value="extra">Extra</option>
+                  <option value="light">Light</option>
+                  <option value="iron">Iron</option>
+                </select>
+              </div>
+              <div class="filter-field">
+                <label for="catalogColorFilter">Color</label>
+                <select id="catalogColorFilter" data-admin-filter="color">
+                  <option value="all">All colors</option>
+                  <?php foreach ($allColors as $color): ?>
+                    <option value="<?php echo admin_escape($color); ?>"><?php echo admin_escape($color); ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="filter-field">
+                <label for="catalogPriceFilter">Price band</label>
+                <select id="catalogPriceFilter" data-admin-filter="price">
+                  <option value="all">All prices</option>
+                  <option value="under-20000">Under ₦20k</option>
+                  <option value="20000-24999">₦20k - ₦24,999</option>
+                  <option value="25000-plus">₦25k and above</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-shell">
+              <table class="product-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Purchase Unit Price</th>
+                    <th>Gallery</th>
+                    <th>Store</th>
+                    <th>Status</th>
+                    <th>Updated</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody data-product-table-body>
+                  <?php foreach ($products as $index => $product): ?>
                     <?php
                       $productId = (string) ($product['id'] ?? '');
                       $productName = (string) ($product['name'] ?? '');
@@ -1234,35 +590,42 @@ function admin_storefront_label(string $storefront): string
                       $productGallery = implode("\n", (array) ($product['images'] ?? []));
                       $productStorefront = extra_store_normalize_storefront((string) ($product['storefront'] ?? ''));
                       $productStorefrontLabel = admin_storefront_label($productStorefront);
-                      $isSelected = $productId !== '' && $productId === $editId;
+                      $productUpdated = (string) ($product['updated_at'] ?? '');
+                      $galleryCount = is_array($product['images'] ?? null) ? count((array) $product['images']) : 0;
                     ?>
-                    <article
-                      class="product-card<?php echo $isSelected ? ' highlight' : ''; ?>"
-                      data-product-card
+                    <tr
+                      data-product-row
+                      data-product-sort="<?php echo (int) ($index + 1); ?>"
                       data-product-id="<?php echo admin_escape($productId); ?>"
                       data-product-name="<?php echo admin_escape($productName); ?>"
                       data-product-color="<?php echo admin_escape($productColor); ?>"
                       data-product-category="<?php echo admin_escape($productCategory); ?>"
                       data-product-price="<?php echo (int) $productPrice; ?>"
-                      data-product-storefront="<?php echo admin_escape($productStorefront); ?>"
-                      data-product-updated="<?php echo admin_escape((string) ($product['updated_at'] ?? '')); ?>"
+                      data-product-store="<?php echo admin_escape($productStorefront); ?>"
+                      data-product-gallery="<?php echo admin_escape($productGallery); ?>"
+                      data-product-description="<?php echo admin_escape($productDescription); ?>"
+                      data-product-image="<?php echo admin_escape($productImage); ?>"
+                      data-product-updated="<?php echo admin_escape($productUpdated); ?>"
                     >
-                      <img class="product-thumb" src="<?php echo admin_escape($productImage !== '' ? $productImage : 'assets/red-product-clean.png'); ?>" alt="<?php echo admin_escape($productName); ?>">
-                      <div class="product-body">
-                        <h3 class="product-name"><?php echo admin_escape($productName); ?></h3>
-                        <p class="product-desc"><?php echo admin_escape($productDescription); ?></p>
-                        <div class="product-meta">
-                          <span><?php echo admin_escape($productCategory); ?></span>
-                          <span class="storefront-tag"><?php echo admin_escape($productStorefrontLabel); ?></span>
+                      <td>
+                        <div class="product-cell">
+                          <img class="product-thumb" src="<?php echo admin_escape($productImage !== '' ? $productImage : 'assets/red-product-clean.png'); ?>" alt="<?php echo admin_escape($productName); ?>">
+                          <div>
+                            <p class="product-name"><?php echo admin_escape($productName); ?></p>
+                            <div class="product-meta">SKU: <?php echo admin_escape($productId !== '' ? $productId : 'auto'); ?> · <?php echo admin_escape($productCategory !== '' ? $productCategory : 'Uncategorized'); ?></div>
+                          </div>
                         </div>
-                        <div class="product-meta" style="margin-top:10px;">
-                          <strong><?php echo admin_escape('₦' . number_format($productPrice)); ?></strong>
-                          <span class="product-id-line">ID: <?php echo admin_escape($productId); ?></span>
-                        </div>
-                        <div class="product-actions">
+                      </td>
+                      <td><?php echo admin_escape('₦' . number_format($productPrice)); ?></td>
+                      <td><span class="pill neutral"><?php echo (int) $galleryCount; ?> image<?php echo $galleryCount === 1 ? '' : 's'; ?></span></td>
+                      <td><span class="pill primary"><?php echo admin_escape($productStorefrontLabel); ?></span></td>
+                      <td><span class="pill success">Active</span></td>
+                      <td><?php echo admin_escape($productUpdated !== '' ? $productUpdated : 'N/A'); ?></td>
+                      <td>
+                        <div class="action-group">
                           <button
                             type="button"
-                            class="btn btn-soft"
+                            class="action-button primary"
                             data-edit-product
                             data-product-id="<?php echo admin_escape($productId); ?>"
                             data-product-name="<?php echo admin_escape($productName); ?>"
@@ -1272,534 +635,187 @@ function admin_storefront_label(string $storefront): string
                             data-product-image="<?php echo admin_escape($productImage); ?>"
                             data-product-gallery="<?php echo admin_escape($productGallery); ?>"
                             data-product-description="<?php echo admin_escape($productDescription); ?>"
-                            data-product-storefront="<?php echo admin_escape($productStorefront); ?>"
+                            data-product-store="<?php echo admin_escape($productStorefront); ?>"
                           >Edit</button>
-                          <form method="post" class="delete-form" data-delete-form data-product-name="<?php echo admin_escape($productName); ?>">
+                          <form method="post" data-delete-form data-product-name="<?php echo admin_escape($productName); ?>">
                             <input type="hidden" name="action_type" value="delete">
                             <input type="hidden" name="id" value="<?php echo admin_escape($productId); ?>">
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="action-button" aria-label="Delete product <?php echo admin_escape($productName); ?>">🗑</button>
                           </form>
                         </div>
-                      </div>
-                    </article>
+                      </td>
+                    </tr>
                   <?php endforeach; ?>
-                </div>
+                </tbody>
+              </table>
+            </div>
 
-                <div class="storefront-empty" data-storefront-empty hidden>No products in this storefront match the current filters.</div>
-              </section>
-            <?php endforeach; ?>
-          </div>
+            <div class="empty-state" data-product-empty hidden>No products match the current filters.</div>
+
+            <div class="catalog-footer">
+              <div class="catalog-footer-count">Showing <span data-product-visible-count><?php echo (int) count($products); ?></span> of <?php echo (int) count($products); ?> products</div>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot primary"></span> Last update: <?php echo admin_escape($latestUpdate !== '' ? $latestUpdate : 'N/A'); ?></span>
+              </div>
+            </div>
+          </section>
         </section>
 
-        <div class="right-stack">
-          <section class="stats-card">
-            <h2 class="panel-title">Overview</h2>
-            <div class="stats-grid">
-              <div class="stat">
-                <strong id="productCount"><?php echo count($products); ?></strong>
-                <span>Products</span>
+        <aside class="side-column stack">
+          <section class="panel" id="orders">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Recent Orders</h2>
+                <div class="panel-subtitle">Latest purchases stored in the admin database</div>
               </div>
-              <div class="stat">
-                <strong><?php echo admin_escape('₦' . number_format($totalValue)); ?></strong>
-                <span>Total value</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo admin_escape($latestUpdate !== '' ? $latestUpdate : 'N/A'); ?></strong>
-                <span>Latest update</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo (int) $extraStorefrontCount; ?></strong>
-                <span>Umbrella products</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo (int) $lightStorefrontCount; ?></strong>
-                <span>Lamp products</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo (int) $ironStorefrontCount; ?></strong>
-                <span>Iron products</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo (int) $orderCount; ?></strong>
-                <span>Orders</span>
-              </div>
-              <div class="stat">
-                <strong><?php echo (int) $pendingOrderCount; ?></strong>
-                <span>Pending</span>
-              </div>
+              <span class="metric-chip primary"><?php echo (int) count($recentOrders); ?> shown</span>
+            </div>
+            <div class="table-shell">
+              <?php if ($recentOrders): ?>
+                <table class="orders-table">
+                  <thead>
+                    <tr>
+                      <th>Order</th>
+                      <th>Customer</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($recentOrders as $order): ?>
+                      <?php
+                        $orderNumber = (string) ($order['order_number'] ?? '');
+                        $productName = (string) ($order['product_name'] ?? '');
+                        $customerName = (string) ($order['customer_name'] ?? '');
+                        $state = (string) ($order['state'] ?? '');
+                        $status = strtolower((string) ($order['status'] ?? 'pending'));
+                        $totalPrice = (int) ($order['total_price'] ?? 0);
+                        $createdAt = (string) ($order['created_at'] ?? '');
+                        $statusClass = 'neutral';
+                        if ($status === 'pending') {
+                            $statusClass = 'warning';
+                        } elseif ($status === 'processing') {
+                            $statusClass = 'primary';
+                        } elseif ($status === 'paid') {
+                            $statusClass = 'success';
+                        } elseif ($status === 'cancelled') {
+                            $statusClass = 'danger';
+                        }
+                      ?>
+                      <tr>
+                        <td>
+                          <div class="orders-cell-title">#<?php echo admin_escape($orderNumber !== '' ? $orderNumber : '—'); ?></div>
+                          <div class="orders-cell-subtitle"><?php echo admin_escape($productName !== '' ? $productName : 'Unknown product'); ?></div>
+                        </td>
+                        <td>
+                          <div class="orders-cell-title"><?php echo admin_escape($customerName !== '' ? $customerName : 'No customer'); ?></div>
+                          <div class="orders-cell-subtitle"><?php echo admin_escape($state !== '' ? $state : 'No state'); ?></div>
+                        </td>
+                        <td><?php echo admin_escape('₦' . number_format($totalPrice)); ?></td>
+                        <td>
+                          <div class="stack" style="gap: 6px;">
+                            <span class="pill <?php echo admin_escape($statusClass); ?>"><?php echo admin_escape($status !== '' ? $status : 'pending'); ?></span>
+                            <span class="orders-cell-subtitle"><?php echo admin_escape($createdAt !== '' ? $createdAt : 'No date'); ?></span>
+                          </div>
+                        </td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              <?php else: ?>
+                <div class="empty-state" style="border-top: 0;">No purchases have been placed yet.</div>
+              <?php endif; ?>
             </div>
           </section>
 
-          <section class="orders-card" id="ordersCard">
-            <h2 class="panel-title">Checkout Orders</h2>
-            <p class="status-line" style="margin-top: 0;">
-              Every purchase saved in the database appears here and is emailed to `wagwulageorge@gmail.com`.
-            </p>
-
-            <?php if ($recentOrders): ?>
-              <div class="orders-list">
-                <?php foreach ($recentOrders as $order): ?>
-                  <?php
-                    $orderNumber = (string) ($order['order_number'] ?? '');
-                    $productName = (string) ($order['product_name'] ?? '');
-                    $customerName = (string) ($order['customer_name'] ?? '');
-                    $state = (string) ($order['state'] ?? '');
-                    $status = strtolower((string) ($order['status'] ?? 'pending'));
-                    $totalPrice = (int) ($order['total_price'] ?? 0);
-                    $createdAt = (string) ($order['created_at'] ?? '');
-                  ?>
-                  <article class="order-entry">
-                    <div class="order-entry-head">
-                      <p class="order-entry-title">#<?php echo admin_escape($orderNumber !== '' ? $orderNumber : '—'); ?> · <?php echo admin_escape($productName !== '' ? $productName : 'Unknown product'); ?></p>
-                      <span class="order-badge status-<?php echo admin_escape($status); ?>"><?php echo admin_escape($status); ?></span>
-                    </div>
-                    <div class="order-meta">
-                      <span><?php echo admin_escape($customerName !== '' ? $customerName : 'No customer name'); ?></span>
-                      <span><?php echo admin_escape($state !== '' ? $state : 'No state'); ?></span>
-                      <span><?php echo admin_escape('₦' . number_format($totalPrice)); ?></span>
-                      <span><?php echo admin_escape($createdAt !== '' ? $createdAt : 'No date'); ?></span>
-                    </div>
-                  </article>
-                <?php endforeach; ?>
+          <section class="panel" id="editor">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Product editor</h2>
+                <div class="panel-subtitle" data-editor-mode><?php echo $selectedProduct ? 'Editing ' . admin_escape((string) ($selectedProduct['id'] ?? 'product')) : 'Creating a new product'; ?></div>
               </div>
-            <?php else: ?>
-              <div class="storefront-empty" style="margin-top: 0;">No purchases have been placed yet.</div>
-            <?php endif; ?>
-          </section>
-
-          <section class="filters-card">
-            <h2 class="panel-title">Filters</h2>
-            <div class="filter-group" style="border-top: 0; padding-top: 0;">
-              <div class="filter-label">Categories</div>
-              <div class="filter-list">
-                <label class="filter-pill"><input type="checkbox" data-filter-category value="all" checked> All</label>
-                <?php foreach ($allCategories as $category): ?>
-                  <label class="filter-pill"><input type="checkbox" data-filter-category value="<?php echo admin_escape($category); ?>"> <?php echo admin_escape($category); ?></label>
-                <?php endforeach; ?>
-              </div>
+              <button type="button" class="btn btn-soft" data-new-product data-storefront="<?php echo admin_escape($editorStorefront); ?>">New Product</button>
             </div>
 
-            <div class="filter-group">
-              <div class="filter-label">Colors</div>
-              <div class="filter-list">
-                <label class="filter-pill"><input type="checkbox" data-filter-color value="all" checked> All</label>
-                <?php foreach ($allColors as $color): ?>
-                  <label class="filter-pill"><input type="checkbox" data-filter-color value="<?php echo admin_escape($color); ?>"> <?php echo admin_escape($color); ?></label>
-                <?php endforeach; ?>
-              </div>
-            </div>
-          </section>
-
-          <section class="editor-card" id="editorCard">
-            <h2 class="panel-title">Create or edit product</h2>
             <img
-              id="editorPreview"
-              class="editor-preview"
               src="<?php echo admin_escape($editorPrimary !== '' ? $editorPrimary : 'assets/red-product-clean.png'); ?>"
               alt="Product preview"
+              class="editor-preview"
+              data-product-preview
             >
 
-            <form method="post" id="productForm" enctype="multipart/form-data">
-              <input type="hidden" name="action_type" id="actionType" value="<?php echo $selectedProduct ? 'update' : 'create'; ?>">
+            <form method="post" enctype="multipart/form-data" class="editor-form" data-product-form>
+              <input type="hidden" name="action_type" value="<?php echo $selectedProduct ? 'update' : 'create'; ?>" data-product-action-type>
               <div class="editor-grid">
                 <div class="field">
                   <label for="productId">Product ID</label>
-                  <input
-                    id="productId"
-                    name="id"
-                    type="text"
-                    value="<?php echo admin_input_value($editorValues['id'] ?? ''); ?>"
-                    placeholder="Leave blank for auto ID"
-                  >
+                  <input id="productId" type="text" name="id" value="<?php echo admin_input_value($editorValues['id'] ?? ''); ?>" placeholder="Leave blank for auto ID" data-product-id>
                 </div>
                 <div class="field">
                   <label for="productName">Product name</label>
-                  <input id="productName" name="name" type="text" value="<?php echo admin_input_value($editorValues['name'] ?? ''); ?>" required>
+                  <input id="productName" type="text" name="name" value="<?php echo admin_input_value($editorValues['name'] ?? ''); ?>" required data-product-name-input>
                 </div>
                 <div class="field">
                   <label for="productPrice">Price</label>
-                  <input id="productPrice" name="price" type="number" min="0" step="1" value="<?php echo admin_input_value($editorValues['price'] ?? ''); ?>" required>
+                  <input id="productPrice" type="number" name="price" min="0" step="1" value="<?php echo admin_input_value($editorValues['price'] ?? ''); ?>" required data-product-price-input>
                 </div>
                 <div class="field">
                   <label for="productColor">Color</label>
-                  <input id="productColor" name="color" type="text" value="<?php echo admin_input_value($editorValues['color'] ?? ''); ?>" required>
+                  <input id="productColor" type="text" name="color" value="<?php echo admin_input_value($editorValues['color'] ?? ''); ?>" required data-product-color-input>
                 </div>
                 <div class="field">
                   <label for="productCategory">Category</label>
-                  <input id="productCategory" name="category" type="text" value="<?php echo admin_input_value($editorValues['category'] ?? ''); ?>" required>
+                  <input id="productCategory" type="text" name="category" value="<?php echo admin_input_value($editorValues['category'] ?? ''); ?>" required data-product-category-input>
                 </div>
                 <div class="field">
                   <label for="productStorefront">Storefront</label>
-                  <select id="productStorefront" name="storefront" required>
+                  <select id="productStorefront" name="storefront" required data-product-storefront-input>
                     <option value="extra"<?php echo $editorStorefront === 'extra' ? ' selected' : ''; ?>>Extra</option>
                     <option value="light"<?php echo $editorStorefront === 'light' ? ' selected' : ''; ?>>Light</option>
                     <option value="iron"<?php echo $editorStorefront === 'iron' ? ' selected' : ''; ?>>Iron</option>
                   </select>
                 </div>
-                <div class="field">
-                  <label for="productImage">Primary image</label>
-                  <input id="productImage" name="image_primary" type="text" value="<?php echo admin_input_value($editorPrimary); ?>" placeholder="Paste an image path or use upload below">
+                <div class="field full">
+                  <label for="productImage">Primary image path</label>
+                  <input id="productImage" type="text" name="image_primary" value="<?php echo admin_input_value($editorPrimary); ?>" placeholder="Paste an image path" data-product-image-input>
                 </div>
                 <div class="field full">
-                  <label for="productImageUpload">Upload primary image from gallery</label>
-                  <input id="productImageUpload" name="image_primary_upload" type="file" accept="image/*">
-                  <div class="status-line">Choose an image from your device to replace the primary product image.</div>
+                  <label for="productImageUpload">Upload primary image</label>
+                  <input id="productImageUpload" type="file" accept="image/*" data-product-image-upload>
+                  <div class="help-text">Upload a local file to replace the primary image without changing the stored path manually.</div>
                 </div>
                 <div class="field full">
                   <label for="productGallery">Gallery images</label>
-                  <textarea id="productGallery" name="images_text" placeholder="One image path per line"><?php echo admin_escape($editorGallery); ?></textarea>
+                  <textarea id="productGallery" name="images_text" placeholder="One image path per line" data-product-gallery-input><?php echo admin_escape($editorGallery); ?></textarea>
                 </div>
                 <div class="field full">
                   <label for="productGalleryUpload">Upload gallery images</label>
-                  <input id="productGalleryUpload" name="gallery_image_uploads[]" type="file" accept="image/*" multiple>
-                  <div class="status-line">Any files you choose here will be added to the product gallery.</div>
+                  <input id="productGalleryUpload" type="file" accept="image/*" multiple data-product-gallery-upload>
+                  <div class="help-text">Any uploaded files are appended to the gallery list when the form is saved.</div>
                 </div>
                 <div class="field full">
                   <label for="productDescription">Description</label>
-                  <textarea id="productDescription" name="description" required><?php echo admin_escape((string) ($editorValues['description'] ?? '')); ?></textarea>
+                  <textarea id="productDescription" name="description" required data-product-description-input><?php echo admin_escape((string) ($editorValues['description'] ?? '')); ?></textarea>
                 </div>
               </div>
 
-              <div class="editor-actions">
+              <div class="editor-footer">
                 <div>
-                  <div id="editorMode" style="font-weight:500; color: var(--accent);">
-                    <?php echo $selectedProduct ? 'Editing ' . admin_escape((string) ($selectedProduct['id'] ?? 'product')) : 'Creating new product'; ?>
-                  </div>
-                  <div class="status-line">Save to update the storefront, checkout, and order emails.</div>
+                  <div class="status-note">Save to update the storefront, checkout, and order flows.</div>
+                  <div class="help-text">The product ID stays locked when editing an existing item so the record remains stable.</div>
                 </div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                  <button type="button" id="newProductBtn" class="btn btn-soft">New Product</button>
-                  <button type="submit" class="btn btn-primary" id="submitButton">Save Product</button>
+                <div class="editor-actions">
+                  <button type="button" class="btn btn-ghost" data-new-product data-storefront="<?php echo admin_escape($editorStorefront); ?>">Reset</button>
+                  <button type="submit" class="btn btn-primary" data-product-submit>Save Product</button>
                 </div>
               </div>
             </form>
           </section>
-        </div>
+        </aside>
       </div>
     </main>
   </div>
 
-  <script>
-    (function () {
-      const searchInput = document.getElementById('productSearch');
-      const globalSearch = document.getElementById('globalSearch');
-      const sortSelect = document.getElementById('productSort');
-      const clearButton = document.getElementById('clearFilters');
-      const storefrontSections = Array.from(document.querySelectorAll('[data-storefront-section]'));
-      const categoryFilters = Array.from(document.querySelectorAll('[data-filter-category]'));
-      const colorFilters = Array.from(document.querySelectorAll('[data-filter-color]'));
-      const form = document.getElementById('productForm');
-      const actionType = document.getElementById('actionType');
-      const editorMode = document.getElementById('editorMode');
-      const submitButton = document.getElementById('submitButton');
-      const newProductBtn = document.getElementById('newProductBtn');
-      const preview = document.getElementById('editorPreview');
-      const idField = document.getElementById('productId');
-      const nameField = document.getElementById('productName');
-      const priceField = document.getElementById('productPrice');
-      const colorField = document.getElementById('productColor');
-      const categoryField = document.getElementById('productCategory');
-      const storefrontField = document.getElementById('productStorefront');
-      const imageField = document.getElementById('productImage');
-      const imageUploadField = document.getElementById('productImageUpload');
-      const galleryField = document.getElementById('productGallery');
-      const galleryUploadField = document.getElementById('productGalleryUpload');
-      const descriptionField = document.getElementById('productDescription');
-      const productCount = document.getElementById('productCount');
-      const sidebar = document.querySelector('[data-sidebar]');
-      const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
-      const sidebarClose = document.querySelector('[data-sidebar-close]');
-      const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
-      let previewBlobUrl = '';
-
-      function normalize(value) {
-        return String(value || '').trim().toLowerCase();
-      }
-
-      function setSidebarOpen(open) {
-        document.body.classList.toggle('sidebar-open', open);
-        if (sidebarOverlay) {
-          sidebarOverlay.hidden = !open;
-        }
-        if (sidebar) {
-          if (window.innerWidth <= 900) {
-            sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
-          } else {
-            sidebar.removeAttribute('aria-hidden');
-          }
-        }
-      }
-
-      function openSidebar() {
-        setSidebarOpen(true);
-      }
-
-      function closeSidebar() {
-        setSidebarOpen(false);
-      }
-
-      function setPreviewSource(src) {
-        if (previewBlobUrl) {
-          URL.revokeObjectURL(previewBlobUrl);
-          previewBlobUrl = '';
-        }
-        preview.src = src;
-      }
-
-      function previewUploadedImage(file) {
-        if (!file) return;
-        if (previewBlobUrl) {
-          URL.revokeObjectURL(previewBlobUrl);
-        }
-        previewBlobUrl = URL.createObjectURL(file);
-        preview.src = previewBlobUrl;
-      }
-
-      function setEditorMode(mode, product = null, storefront = 'extra') {
-        actionType.value = mode;
-        submitButton.textContent = mode === 'create' ? 'Create Product' : 'Save Product';
-        editorMode.textContent = mode === 'create'
-          ? 'Creating new product'
-          : `Editing ${product?.id || 'product'}`;
-        idField.readOnly = mode === 'update';
-        idField.placeholder = mode === 'create' ? 'Leave blank for auto ID' : '';
-        if (mode === 'create') {
-          idField.value = '';
-          if (storefrontField) storefrontField.value = storefront;
-        }
-      }
-
-      function fillEditor(data) {
-        if (!data) return;
-        idField.value = data.id || '';
-        nameField.value = data.name || '';
-        priceField.value = data.price || '';
-        colorField.value = data.color || '';
-        categoryField.value = data.category || '';
-        if (storefrontField) storefrontField.value = data.storefront || 'extra';
-        imageField.value = data.image || '';
-        galleryField.value = data.gallery || '';
-        descriptionField.value = data.description || '';
-        if (imageUploadField) imageUploadField.value = '';
-        if (galleryUploadField) galleryUploadField.value = '';
-        setPreviewSource(data.image || preview.src);
-        setEditorMode('update', data, data.storefront || 'extra');
-        document.getElementById('editorCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      function clearEditor(storefront = 'extra') {
-        form.reset();
-        idField.value = '';
-        nameField.value = '';
-        priceField.value = '';
-        colorField.value = '';
-        categoryField.value = '';
-        if (storefrontField) storefrontField.value = storefront;
-        imageField.value = '';
-        galleryField.value = '';
-        descriptionField.value = '';
-        if (imageUploadField) imageUploadField.value = '';
-        if (galleryUploadField) galleryUploadField.value = '';
-        setPreviewSource('assets/red-product-clean.png');
-        setEditorMode('create', null, storefront);
-        nameField.focus();
-        document.getElementById('editorCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      function sortVisibleCards(list, sortMode) {
-        return [...list].sort((left, right) => {
-          if (sortMode === 'price-low') return Number(left.dataset.productPrice || 0) - Number(right.dataset.productPrice || 0);
-          if (sortMode === 'price-high') return Number(right.dataset.productPrice || 0) - Number(left.dataset.productPrice || 0);
-          if (sortMode === 'name') return (left.dataset.productName || '').localeCompare(right.dataset.productName || '');
-          return (right.dataset.productUpdated || '').localeCompare(left.dataset.productUpdated || '');
-        });
-      }
-
-      function applyFilters() {
-        const query = normalize(searchInput?.value);
-        const selectedCategories = categoryFilters.filter((checkbox) => checkbox.checked && checkbox.value !== 'all').map((checkbox) => normalize(checkbox.value));
-        const selectedColors = colorFilters.filter((checkbox) => checkbox.checked && checkbox.value !== 'all').map((checkbox) => normalize(checkbox.value));
-        const sortMode = sortSelect?.value || 'featured';
-        let totalVisible = 0;
-
-        storefrontSections.forEach((section) => {
-          const sectionGrid = section.querySelector('[data-storefront-grid]');
-          const sectionEmpty = section.querySelector('[data-storefront-empty]');
-          const sectionCount = section.querySelector('[data-storefront-count]');
-          const sectionCards = Array.from(section.querySelectorAll('[data-product-card]'));
-          const visible = sectionCards.filter((card) => {
-            const haystack = [
-              card.dataset.productName,
-              card.dataset.productCategory,
-              card.dataset.productColor,
-              card.dataset.productId,
-              card.dataset.productStorefront
-            ].join(' ').toLowerCase();
-            const matchesQuery = !query || haystack.includes(query);
-            const matchesCategory = !selectedCategories.length || selectedCategories.includes(normalize(card.dataset.productCategory));
-            const matchesColor = !selectedColors.length || selectedColors.includes(normalize(card.dataset.productColor));
-            return matchesQuery && matchesCategory && matchesColor;
-          });
-
-          const visibleSet = new Set(visible);
-          sectionCards.forEach((card) => {
-            card.hidden = !visibleSet.has(card);
-          });
-
-          const sorted = sortVisibleCards(visible, sortMode);
-          if (sectionGrid) {
-            sorted.forEach((card) => sectionGrid.appendChild(card));
-          }
-
-          if (sectionCount) {
-            sectionCount.textContent = String(sorted.length);
-          }
-          if (sectionEmpty) {
-            sectionEmpty.hidden = sorted.length !== 0;
-          }
-
-          totalVisible += sorted.length;
-        });
-
-        if (productCount) {
-          productCount.textContent = String(totalVisible);
-        }
-      }
-
-      sidebarToggle?.addEventListener('click', openSidebar);
-      sidebarClose?.addEventListener('click', closeSidebar);
-      sidebarOverlay?.addEventListener('click', closeSidebar);
-
-      sidebar?.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', () => {
-          if (window.innerWidth <= 900) {
-            closeSidebar();
-          }
-        });
-      });
-
-      window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          closeSidebar();
-        }
-      });
-
-      window.addEventListener('resize', () => {
-        if (window.innerWidth > 900) {
-          closeSidebar();
-        }
-      });
-
-      document.addEventListener('click', (event) => {
-        const newProductForStorefront = event.target.closest('[data-new-product-for-storefront]');
-        if (newProductForStorefront) {
-          clearEditor(newProductForStorefront.dataset.storefront || 'extra');
-          return;
-        }
-
-        const editButton = event.target.closest('[data-edit-product]');
-        if (editButton) {
-          fillEditor({
-            id: editButton.dataset.productId,
-            name: editButton.dataset.productName,
-            price: editButton.dataset.productPrice,
-            color: editButton.dataset.productColor,
-            category: editButton.dataset.productCategory,
-            image: editButton.dataset.productImage,
-            gallery: editButton.dataset.productGallery,
-            description: editButton.dataset.productDescription,
-            storefront: editButton.dataset.productStorefront
-          });
-        }
-      });
-
-      document.addEventListener('submit', (event) => {
-        const deleteForm = event.target.closest('[data-delete-form]');
-        if (!deleteForm) return;
-
-        const productName = deleteForm.dataset.productName || 'this product';
-        if (!window.confirm(`Delete ${productName}?`)) {
-          event.preventDefault();
-        }
-      });
-
-      categoryFilters.forEach((checkbox) => {
-        checkbox.addEventListener('change', () => {
-          if (checkbox.value === 'all' && checkbox.checked) {
-            categoryFilters.forEach((item) => {
-              if (item !== checkbox) item.checked = false;
-            });
-          } else if (checkbox.checked) {
-            const all = categoryFilters.find((item) => item.value === 'all');
-            if (all) all.checked = false;
-          }
-          applyFilters();
-        });
-      });
-
-      colorFilters.forEach((checkbox) => {
-        checkbox.addEventListener('change', () => {
-          if (checkbox.value === 'all' && checkbox.checked) {
-            colorFilters.forEach((item) => {
-              if (item !== checkbox) item.checked = false;
-            });
-          } else if (checkbox.checked) {
-            const all = colorFilters.find((item) => item.value === 'all');
-            if (all) all.checked = false;
-          }
-          applyFilters();
-        });
-      });
-
-      globalSearch?.addEventListener('input', () => {
-        if (searchInput) {
-          searchInput.value = globalSearch.value;
-        }
-        applyFilters();
-      });
-      searchInput?.addEventListener('input', () => {
-        if (globalSearch && globalSearch.value !== searchInput.value) {
-          globalSearch.value = searchInput.value;
-        }
-        applyFilters();
-      });
-      sortSelect?.addEventListener('change', applyFilters);
-
-      clearButton?.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        if (sortSelect) sortSelect.value = 'featured';
-        categoryFilters.forEach((checkbox) => {
-          checkbox.checked = checkbox.value === 'all';
-        });
-        colorFilters.forEach((checkbox) => {
-          checkbox.checked = checkbox.value === 'all';
-        });
-        applyFilters();
-      });
-
-      newProductBtn?.addEventListener('click', () => clearEditor('extra'));
-
-      imageField?.addEventListener('input', () => {
-        if (imageField.value.trim()) {
-          setPreviewSource(imageField.value.trim());
-        }
-      });
-
-      imageUploadField?.addEventListener('change', () => {
-        const file = imageUploadField.files && imageUploadField.files[0] ? imageUploadField.files[0] : null;
-        if (file) {
-          previewUploadedImage(file);
-        }
-      });
-
-      applyFilters();
-
-      <?php if ($selectedProduct): ?>
-      setEditorMode('update', { id: <?php echo json_encode((string) $selectedProduct['id']); ?> });
-      <?php else: ?>
-      setEditorMode('create');
-      <?php endif; ?>
-    })();
-  </script>
+  <script src="assets/js/admin.js" defer></script>
 </body>
 </html>
